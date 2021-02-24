@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
-
+//WARNING: THIS SCRIPT IS NOT USED RIGHT NOW!!!
 public class Fadeout : MonoBehaviour
 {
     private bool faded = false;

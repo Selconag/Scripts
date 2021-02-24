@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.SceneManagement;
 public class Menus : MonoBehaviour
 {
     //Other Classes
@@ -14,12 +14,13 @@ public class Menus : MonoBehaviour
     public GameObject Login;
     public GameObject StartTest;
     public GameObject PreTest;
-    public GameObject GroupX;
+    public GameObject User_Detail_Panel;
     public GameObject GroupY;
     //Special Texts
     public Text QuestionTextPlace;
     //Variables
     private int i = 0;
+    private int buttonvalue = 1;
     //Special Texts
     public GameObject PreQuestions;
     //Buttons
@@ -29,11 +30,19 @@ public class Menus : MonoBehaviour
     public Image Rainbow;
     public Image Rainbow2;
     public GameObject NextButton;
-    //TextBoxes
+    //TextBoxes of Sign-in/Login
     public Text NameBox;
     public Text EmailBox;
     public Text PasswordBox;
+    //TextBoxes of PreTest User Details
+    public Text Age;
+    public Text Gender;
+    public Text Occupation;
+    public Text ProfExp;
+    //Game Scene
 
+    //Classes
+    
 
     //Questions that will be used in Pre-Test
     //1-8 Questions will take Yes/No
@@ -52,13 +61,20 @@ public class Menus : MonoBehaviour
     };
     //Questions answers will be stored in here came from Pre-test
     private string[] Answers = new string[9];
+
     void Start()
     {
         Landing.SetActive(true);
         StartCoroutine(Landing_Fade());
+        //Check IF a local save data is here
+
+        //If:Connect Button appears
+
+        //Else:Connect button fades away
+
     }
     
-    //UNCOMPLETED
+    //COMPLETED!!
     //Play button behaivour region from Connect Panel
     public void Play_Button()
     {
@@ -69,6 +85,9 @@ public class Menus : MonoBehaviour
 
     //UNCOMPLETED
     //Connect button behaivour region from Connect Panel
+    //Reads local Connection.json data and gets 2 variables
+    //gets user_id and security, sends the data and auto-connects to server
+    //then logs-in to app and continues on where the person left
     public void Connect_Button()
     {
         //Serialization
@@ -77,21 +96,20 @@ public class Menus : MonoBehaviour
         if (!(Local_User ==  "No"))
         {
             Connect.SetActive(false);
-
             /*
-             If user made pre-test before -> Go to Game
-             Else hop on the PreTests Page(Even if half of questions are answered, we still reset the situation)
+             If user not made pre-test before -> Go to PreTest
+             Else user made pre-test before -> Go to Game
              */
-            if (Local_User.Contains("Done"))//WİLL CHANGE
+            if (Local_User.Contains("modul:0"))
             {
-                //GamePage.SetActive(true);
-                Connect.SetActive(false); //FOR NOW!!
+                Connect.SetActive(false);
+                StartTest.SetActive(true);
             }
             else
             {
-                StartTest.SetActive(true);
+                Connect.SetActive(false); //FOR NOW!!
+                SceneManager.LoadScene("Basketbol");
             }
-            
         }
         else
         {
@@ -110,9 +128,9 @@ public class Menus : MonoBehaviour
             //If email contains both "."(dots) and "@"(at) chars, accept email 
             if (EmailBox.text.Contains("@") && EmailBox.text.Contains("."))
             {
-                string name = NameBox.text.ToString();
-                string email = EmailBox.text.ToString();
-                string password = PasswordBox.text.ToString();
+                D.user.name = NameBox.text.ToString();
+                D.user.email = EmailBox.text.ToString();
+                D.user.password = PasswordBox.text.ToString();
                 //send data to server
             }
             else
@@ -170,26 +188,30 @@ public class Menus : MonoBehaviour
 
     //UNCOMPLETED
     //??? button behaivour region from PreTest Panel
-    public void Tests()
+    public void Tests_Next_Button()
     {
-        if (GroupX.activeSelf)//NEXT Butonuna tıklanınca
+        //Sends User Details on first "next" button click
+        if (User_Detail_Panel.activeSelf)//NEXT Butonuna tıklanınca
         {
-            //Cevapları al ve gönder veya kaydet
+            //Cevapları al ve gönder
+            D.user.age = Age.text.ToString();
+            D.user.country = Gender.text.ToString();
+            D.user.name = Occupation.text.ToString();
+            D.user.name = ProfExp.text.ToString();
             Button_Waiter();
-            GroupX.SetActive(false);
+            User_Detail_Panel.SetActive(false);
             GroupY.SetActive(true);
         }
         else
         {
-            
-            for (i = 0; i < 9; i++)
-            {
-                //Sonraki soruyu al
-                QuestionTextPlace.text = Questions[i];
-                Dialog();
-                
-            }
+            //Sonraki soruyu al
+            QuestionTextPlace.text = Questions[i];
+
+
             //Cevabı al ve yolla
+            Dialog();
+
+            
 
             //sonraki soruya geçmek için sayacı arttır
             i++;
@@ -206,8 +228,16 @@ public class Menus : MonoBehaviour
     }
 
     //Next button behaivour region from all Pretest Panels
-    public void Next_Activator()
+    public void Next_Button()
     {
+        if (User_Detail_Panel)
+        {
+
+        }
+        else
+        {
+
+        }
         NextButton.SetActive(true);
     }
 
@@ -222,7 +252,7 @@ public class Menus : MonoBehaviour
         if (waitForButtonYesNo.PressedButton == yesButton)
         {
             // yes was pressed
-            Next_Activator();
+            Next_Button();
 
         }
         else
@@ -251,4 +281,10 @@ public class Menus : MonoBehaviour
 
         yield return 0;
     }
+    //Pre-Test rating value taker
+    public void RatingButtonValueTaker(int button)
+    {
+        buttonvalue = button;
+    }
+
 }

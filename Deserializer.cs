@@ -14,20 +14,21 @@ using Library;
 public class Deserializer : MonoBehaviour
 {
     //User class data taker
-    public string Ujson;
+    private string Ujson;
     //Connect class data taker
-    public string Cjson;
+    private string Cjson;
     //PreTest class data taker
-    public string Tjson;
+    private string Tjson;
 
-    public byte[] xbyte;
+    private byte[] xbyte;
     //User class data stored path    
-    public string path = @"C:\Unity Projects\UI\Assets\Scripts\UserData.json";//Can change later
+    private string path = @"C:\Unity Projects\UI\Assets\Scripts\UserData.json";//Can change later
     //Connect class data stored path
-    public string Cpath = @"C:\Unity Projects\UI\Assets\Scripts\ConnectionData.json";//Can change later
+    private string Cpath = @"C:\Unity Projects\UI\Assets\Scripts\ConnectionData.json";//Can change later
 
     public User user = new User();
     public Connection con = new Connection();
+    public PreTest pre = new PreTest();
 
     //API Connection url addresses for the application
     private const string Register_URL = "http://esvolon.uniqdesignfactory.com/api/users/register";//Can change later between(localhost -> Esvolon)
@@ -37,39 +38,54 @@ public class Deserializer : MonoBehaviour
     //Sender mesage for UnityWebRequest. An old implementation.
     private string sendermessage;
 
-    // Start is called before the first frame update
     void Start()
     {
-        //SENDTHENUKES();
+       
     }
     //Used for Json Deserialization
 
-    public void DestroySerialization()
+    //public void DestroySerialization()
+    //{
+
+    //    Ujson = JsonUtility.ToJson(user) ?? "";
+    //    System.IO.File.WriteAllText(path, Ujson);
+    //    Debug.Log("Written file is:" + Ujson);
+    //    //return json;
+    //}
+    public void BuildNewSerialization(User user1)
     {
-        //trying values
-        //user.name = "Control1";
-        //user.email = "control@gmail.com";
-        //user.password = "Controlx";
-        Ujson = JsonUtility.ToJson(user) ?? "";
-        System.IO.File.WriteAllText(path, Ujson);
-        Debug.Log("Written file is:" + Ujson);
+        Ujson = JsonUtility.ToJson(user1) ?? "";
+        StartCoroutine(Upload(Ujson));
+        BuildSerialization(con);
+        System.IO.File.WriteAllText(Cpath, Cjson);
+        //return json;
+    }
+    //Used For Manual Login
+    public void LoginManuel(User user1)
+    {
+        Ujson = JsonUtility.ToJson(user1) ?? "";
+        Sender(Ujson);
+        con = JsonUtility.FromJson<Connection>(Cjson);
+        System.IO.File.WriteAllText(Cpath, Cjson);
         //return json;
     }
 
-    //Used for Json Serialization - OLD IMPLEMENTATION
-    /*
-    public void BuildSerialization()
+    //Used for AutoLogin
+
+    public bool AutoLogin()
     {
-        Cjson = System.IO.File.ReadAllText(path);
+        Cjson = System.IO.File.ReadAllText(Cpath);
         con = JsonUtility.FromJson<Connection>(Cjson);
-        Debug.Log("Readed file is:" + Ujson);
-        //return user;
+        return true;
     }
-    */
+    
     //Used for Json Serialization
-    public void BuildSerialization(PreTest test)
+    public void SendTestData(PreTest test)
     {
-        test = JsonUtility.FromJson<PreTest>(Tjson);
+        Cjson = System.IO.File.ReadAllText(Cpath);
+        Tjson = JsonUtility.ToJson(test) ?? "";
+        Sender(Cjson+Tjson);
+
     }
     //User Serializer
     public void BuildSerialization(User user1)
@@ -111,7 +127,6 @@ public class Deserializer : MonoBehaviour
     
     IEnumerator Upload()
     {
-
         WebRequest request = WebRequest.Create(Register_URL);//Burası değişecek(localhost -> Esvolon)
         request.Method = "POST";
 
@@ -144,7 +159,7 @@ public class Deserializer : MonoBehaviour
             // Read the content.
             string responseFromServer = reader.ReadToEnd();
             //Overwrite the registered data its newly added data
-            JsonUtility.FromJsonOverwrite(responseFromServer,user);
+            JsonUtility.FromJsonOverwrite(responseFromServer,con);
             // Display the content.
             Console.WriteLine(responseFromServer);
         }
@@ -155,45 +170,51 @@ public class Deserializer : MonoBehaviour
     
     IEnumerator Upload(string data)
     {
-
         WebRequest request = WebRequest.Create(Register_URL);//Burası değişecek(localhost -> Esvolon)
         request.Method = "POST";
-
-        // Create POST data and convert it to a byte array.
-        xbyte = System.Text.Encoding.UTF8.GetBytes(System.IO.File.ReadAllText(path));
-
-        // Set the ContentType property of the WebRequest.
+        xbyte = System.Text.Encoding.UTF8.GetBytes(data);
         request.ContentType = "application/json";
-        // Set the ContentLength property of the WebRequest.
         request.ContentLength = xbyte.Length;
-
-        // Get the request stream.
         Stream dataStream = request.GetRequestStream();
-        // Write the data to the request stream.
         dataStream.Write(xbyte, 0, xbyte.Length);
-        // Close the Stream object.
         dataStream.Close();
 
-        // Get the response.
         WebResponse response = request.GetResponse();
-        // Display the status.
         Console.WriteLine(((HttpWebResponse)response).StatusDescription);
 
-        // Get the stream containing content returned by the server.
-        // The using block ensures the stream is automatically closed.
         using (dataStream = response.GetResponseStream())
         {
-            // Open the stream using a StreamReader for easy access.
             StreamReader reader = new StreamReader(dataStream);
-            // Read the content.
             string responseFromServer = reader.ReadToEnd();
-            //Overwrite the registered data its newly added data
-            JsonUtility.FromJsonOverwrite(responseFromServer, user);
-            // Display the content.
+            JsonUtility.FromJsonOverwrite(responseFromServer, con);
             Console.WriteLine(responseFromServer);
         }
-        // Close the response.
         response.Close();
         yield return 0;
+    }
+
+    //Daha sonra URL'yi methodu çağırırken yolla ki modüler tasarım olsun
+    public bool Sender(string data) {
+        WebRequest request = WebRequest.Create(Login_URL);//Burası değişecek(localhost -> Esvolon)
+        request.Method = "POST";
+        xbyte = System.Text.Encoding.UTF8.GetBytes(data);
+        request.ContentType = "application/json";
+        request.ContentLength = xbyte.Length;
+        Stream dataStream = request.GetRequestStream();
+        dataStream.Write(xbyte, 0, xbyte.Length);
+        dataStream.Close();
+
+        WebResponse response = request.GetResponse();
+        Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+        
+        using (dataStream = response.GetResponseStream())
+        {
+            StreamReader reader = new StreamReader(dataStream);
+            string responseFromServer = reader.ReadToEnd();
+            JsonUtility.FromJsonOverwrite(responseFromServer, con);
+            Console.WriteLine(responseFromServer);
+        }
+        response.Close();
+        return true;
     }
 }

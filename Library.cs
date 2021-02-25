@@ -11,10 +11,6 @@ namespace Library
         [SerializeField] public string email;
         //Password defined by user / Min 8 length chars and vars
         [SerializeField] public string password;
-        /*    //Security number for security clearance
-        [SerializeField] public string security;
-        //User id which created on the sign-up / Unique
-        [SerializeField] public string user_id; */
         //Check if user details are entered
         [SerializeField] public string user_detail = "No";
         //User age variable from pre-test
@@ -27,7 +23,13 @@ namespace Library
         [SerializeField] public string prof_exp;
         //User country variable from pre-test 
         [SerializeField] public string country;
-
+        //For now these parts are implemented in Connection Class for modular usage
+        //Security number for security clearance
+        [SerializeField] public string security;
+        //User id which created on the sign-up / Unique
+        [SerializeField] public string user_id;
+        //Is user finished Pre-Test?
+        [SerializeField] public int modul = 0;
     }
     [System.Serializable]
     public class Connection
@@ -36,8 +38,7 @@ namespace Library
         [SerializeField] public string security;
         //User id which created on the sign-up / Unique
         [SerializeField] public string user_id;
-        //Is user finished Pre-Test?
-        [SerializeField] public int modul = 0;
+        
     }
     [System.Serializable]
     public class Game

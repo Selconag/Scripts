@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Library;
 public class Menus : MonoBehaviour
 {
     //Other Classes
+
     Deserializer D;
     //UI Panels of Menu
     public GameObject Landing;
@@ -15,14 +17,16 @@ public class Menus : MonoBehaviour
     public GameObject StartTest;
     public GameObject PreTest;
     public GameObject User_Detail_Panel;
-    public GameObject GroupY;
+    public GameObject TestGroup;
     //Special Texts
     public Text QuestionTextPlace;
     //Variables
     private int i = 0;
     private int buttonvalue = 1;
-    //Special Texts
-    public GameObject PreQuestions;
+    private string buttonstate;
+    //Special Objects
+    public GameObject YesNoButtonHolder;//Yes No Buttons
+    public GameObject NumberButtonHolder;//For Rating Buttons
     //Buttons
     public Button yesButton;
     public Button noButton;
@@ -39,10 +43,10 @@ public class Menus : MonoBehaviour
     public Text Gender;
     public Text Occupation;
     public Text ProfExp;
-    //Game Scene
 
-    //Classes
+    //Game Scene
     
+    //Classes
 
     //Questions that will be used in Pre-Test
     //1-8 Questions will take Yes/No
@@ -59,18 +63,21 @@ public class Menus : MonoBehaviour
         "Do you have any knowledge on good governance, safety and security in sport events?",
         "What do you think about your level of knowledge and skills in social innovation and leadership in sports?"
     };
-    //Questions answers will be stored in here came from Pre-test
-    private string[] Answers = new string[9];
 
     void Start()
     {
-        Landing.SetActive(true);
-        StartCoroutine(Landing_Fade());
-        //Check IF a local save data is here
+        //ENABLE THIS LATER!!!
+        //Landing.SetActive(true);
+        //StartCoroutine(Landing_Fade());
 
+        //Check IF a local save data is here
+        D = GetComponent<Deserializer>();
         //If:Connect Button appears
 
         //Else:Connect button fades away
+
+        //ONLY TEST GroupY in here
+        QuestionTextPlace.text = Questions[i];
 
     }
     
@@ -102,6 +109,8 @@ public class Menus : MonoBehaviour
              */
             if (Local_User.Contains("modul:0"))
             {
+                //Send data and open a connection if user is available
+
                 Connect.SetActive(false);
                 StartTest.SetActive(true);
             }
@@ -126,13 +135,13 @@ public class Menus : MonoBehaviour
         if (NameBox.text.Length > 0 && EmailBox.text.Length > 0 && PasswordBox.text.Length > 0)
         {
             //If email contains both "."(dots) and "@"(at) chars, accept email 
-            if (EmailBox.text.Contains("@") && EmailBox.text.Contains("."))
+            if (((EmailBox.text).ToString()).Contains("@") && ((EmailBox.text).ToString()).Contains("."))
             {
                 D.user.name = NameBox.text.ToString();
                 D.user.email = EmailBox.text.ToString();
                 D.user.password = PasswordBox.text.ToString();
                 //send data to server
-                D.BuildSerialization(D.user);
+                D.BuildNewSerialization(D.user);
             }
             else
             {
@@ -149,8 +158,11 @@ public class Menus : MonoBehaviour
             //Disappear it after 0.5 minutes?
             //Texts are not disappeared
         }
-    //
-    Signin.SetActive(false);
+        NameBox.text = "";
+        EmailBox.text = "";
+        PasswordBox.text = "";
+        //
+        Signin.SetActive(false);
         Connect.SetActive(true);
     }
 
@@ -158,22 +170,45 @@ public class Menus : MonoBehaviour
     //Login button behaivour region from Signin Panel
     public void Login_Button()
     {
-        if (Signin.activeSelf)
+        //If user inputs are fully given
+        if (EmailBox.text.Length > 0 && PasswordBox.text.Length > 0)
         {
-            Button_Waiter();
-            Signin.SetActive(false);
-            Login.SetActive(true);
+            //If email contains both "."(dots) and "@"(at) chars, accept email 
+            if (((EmailBox.text).ToString()).Contains("@") && ((EmailBox.text).ToString()).Contains("."))
+            {
+                D.user.email = EmailBox.text.ToString();
+                D.user.password = PasswordBox.text.ToString();
+                //Do the login
+                D.BuildNewSerialization(D.user);
+                //IF pretest not made
+                if (D.user.modul == 0)
+                {
+                    Login.SetActive(false);
+                    PreTest.SetActive(true);
+                }
+                //IF pretest made
+                else
+                {
+                    Login.SetActive(false);
+                    //GameScene Change
+                }                
+            }
+            else
+            {
+                //Error: Email must be filled correct!
+                //As an error message open a new panel with text on it
+                //Disappear it after 0.5 minutes?
+            }
         }
         else
         {
-            //SISTEME GIRIS YAPACAK
-            //...
-
-
-            //
-            Login.SetActive(false);
-            StartTest.SetActive(true);
+            //Error: All boxes must be filled!
+            //As an error message open a new panel with text on it
+            //Disappear it after 0.5 minutes?
+            //Texts are not disappeared
         }
+        EmailBox.text = "";
+        PasswordBox.text = "";
     }
 
     //UNCOMPLETED
@@ -182,8 +217,8 @@ public class Menus : MonoBehaviour
     {
         Button_Waiter();
         StartTest.SetActive(false);
-        PreTest.SetActive(true); 
-      //  Tests();
+        PreTest.SetActive(true);
+        QuestionTextPlace.text = Questions[i];
 
     }
 
@@ -191,41 +226,67 @@ public class Menus : MonoBehaviour
     //??? button behaivour region from PreTest Panel
     public void Tests_Next_Button()
     {
-        //Sends User Details on first "next" button click
-        if (User_Detail_Panel.activeSelf)//NEXT Butonuna tıklanınca
+        if (buttonstate != null || buttonvalue != 0) 
         {
-            //Cevapları al ve gönder
-            D.user.age = Age.text.ToString();
-            D.user.country = Gender.text.ToString();
-            D.user.name = Occupation.text.ToString();
-            D.user.name = ProfExp.text.ToString();
-            Button_Waiter();
-            User_Detail_Panel.SetActive(false);
-            GroupY.SetActive(true);
-        }
-        else
-        {
-            //Sonraki soruyu al
-            QuestionTextPlace.text = Questions[i];
-
-
-            //Cevabı al ve yolla
-            Dialog();
-
-            
-
-            //sonraki soruya geçmek için sayacı arttır
-            i++;
+            //Sends User Details on first "next" button click
+            if (User_Detail_Panel.activeSelf)//NEXT Butonuna tıklanınca
+            {
+                //Cevapları al ve gönder
+                D.user.age = Age.text.ToString();
+                D.user.country = Gender.text.ToString();
+                D.user.occupation = Occupation.text.ToString();
+                D.user.prof_exp = ProfExp.text.ToString();
+                D.user.security = D.con.security;
+                D.user.user_id = D.con.user_id;
+                D.BuildNewSerialization(D.user);
+                User_Detail_Panel.SetActive(false);
+                TestGroup.SetActive(true);
+            }
+            else
+            {
+                //Soruyu al
+                QuestionTextPlace.text = Questions[i];
+                switch (i)
+                {
+                    //Sends answers based on which question we are on
+                    case 0:
+                        D.pre.bir = buttonstate;
+                        break;
+                    case 1:
+                        D.pre.iki = buttonstate;
+                        break;
+                    case 2:
+                        D.pre.uc = buttonstate;
+                        break;
+                    case 3:
+                        D.pre.dort = buttonstate;
+                        break;
+                    case 4:
+                        D.pre.bes = buttonstate;
+                        break;
+                    case 5:
+                        D.pre.alti = buttonstate;
+                        break;
+                    case 6:
+                        D.pre.yedi = buttonstate;
+                        break;
+                    case 7:
+                        D.pre.sekiz = buttonstate;
+                        YesNoButtonHolder.SetActive(false);
+                        NumberButtonHolder.SetActive(true);
+                        break;
+                    case 8:
+                        D.pre.puan = buttonvalue;
+                        D.SendTestData(D.pre);
+                        break;
+                }
+                //Increment the counter to get next question
+                i++;
+            }
+            buttonstate = null;
+            buttonvalue = 0;
         }
         
-        
-    }
-
-    //UNCOMPLETED
-    //Used for copy_paste operations
-    public void Nuller()
-    {
-        Debug.Log("Hello");
     }
 
     //Next button behaivour region from all Pretest Panels
@@ -244,7 +305,7 @@ public class Menus : MonoBehaviour
 
 
 
-
+/*
     IEnumerator Dialog()
     {
         // ...
@@ -262,6 +323,7 @@ public class Menus : MonoBehaviour
             NextButton.SetActive(true);
         }
     }
+*/
     //COMPLETED!!
     //Waits half minute for smooth transition
     //It will be used in 2 different operations
@@ -286,6 +348,19 @@ public class Menus : MonoBehaviour
     public void RatingButtonValueTaker(int button)
     {
         buttonvalue = button;
+    }
+    //PreTest Yes-No value Taker
+    public void YesNoButtonValueTaker(bool button)
+    {
+        if (button)
+        {
+            buttonstate = "Yes";
+        }
+        else
+        {
+            buttonstate = "No";
+        }
+        
     }
 
 }

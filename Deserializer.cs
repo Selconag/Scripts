@@ -56,7 +56,8 @@ public class Deserializer : MonoBehaviour
         //return json;
     }
 
-    //Used for Json Serialization
+    //Used for Json Serialization - OLD IMPLEMENTATION
+    /*
     public void BuildSerialization()
     {
         Cjson = System.IO.File.ReadAllText(path);
@@ -64,28 +65,22 @@ public class Deserializer : MonoBehaviour
         Debug.Log("Readed file is:" + Ujson);
         //return user;
     }
+    */
     //Used for Json Serialization
     public void BuildSerialization(PreTest test)
     {
-        test = JsonUtility.FromJson<PreTest>(Ujson);
-        Debug.Log("Readed file is:" + Ujson);
-        //return user;
+        test = JsonUtility.FromJson<PreTest>(Tjson);
     }
     //User Serializer
     public void BuildSerialization(User user1)
     {
         user1 = JsonUtility.FromJson<User>(Ujson);
-        Debug.Log("Readed file is:" + Ujson);
-        //return user;
     }
     //Connection Serializer
-
     public void BuildSerialization(Connection conn1)
     {
-        Ujson = System.IO.File.ReadAllText(path);
         conn1 = JsonUtility.FromJson<Connection>(Cjson);
-        Debug.Log("Readed file is:" + Cjson);
-        //return user;
+        ///return conn1;
     }
 
     //COMPLETED!!

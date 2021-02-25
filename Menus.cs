@@ -132,6 +132,7 @@ public class Menus : MonoBehaviour
                 D.user.email = EmailBox.text.ToString();
                 D.user.password = PasswordBox.text.ToString();
                 //send data to server
+                D.BuildSerialization(D.user);
             }
             else
             {

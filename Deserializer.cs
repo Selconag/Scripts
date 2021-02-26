@@ -31,10 +31,7 @@ public class Deserializer : MonoBehaviour
     public PreTest pre = new PreTest();
 
     //API Connection url addresses for the application
-    private const string Register_URL = "http://esvolon.uniqdesignfactory.com/api/users/register";//Can change later between(localhost -> Esvolon)
-    private const string Login_URL = "http://esvolon.uniqdesignfactory.com/api/users/login";
-    private const string ForgotPassword_URL = "http://esvolon.uniqdesignfactory.com/api/users/forgot-password";
-    private const string UserDetail_URL = "http://esvolon.uniqdesignfactory.com/api/users/user-detail";
+    
     //Sender mesage for UnityWebRequest. An old implementation.
     private string sendermessage;
 
@@ -105,10 +102,13 @@ public class Deserializer : MonoBehaviour
     //else return "No" as string
     public string GetLocalUserData()
     {
+        //check if file is available
+        //then post security and u_id to server
         if (File.Exists(Cpath))
         {
             Cjson = System.IO.File.ReadAllText(Cpath);
             con = JsonUtility.FromJson<Connection>(Cjson);
+            //post data here and then get the user data from server
             return Cjson;
         }
         else
@@ -127,7 +127,7 @@ public class Deserializer : MonoBehaviour
     
     IEnumerator Upload()
     {
-        WebRequest request = WebRequest.Create(Register_URL);//Burası değişecek(localhost -> Esvolon)
+        WebRequest request = WebRequest.Create(Links.Register_URL);//Burası değişecek(localhost -> Esvolon)
         request.Method = "POST";
 
         // Create POST data and convert it to a byte array.
@@ -170,7 +170,7 @@ public class Deserializer : MonoBehaviour
     
     IEnumerator Upload(string data)
     {
-        WebRequest request = WebRequest.Create(Register_URL);//Burası değişecek(localhost -> Esvolon)
+        WebRequest request = WebRequest.Create(Links.Register_URL);//Burası değişecek(localhost -> Esvolon)
         request.Method = "POST";
         xbyte = System.Text.Encoding.UTF8.GetBytes(data);
         request.ContentType = "application/json";
@@ -193,9 +193,10 @@ public class Deserializer : MonoBehaviour
         yield return 0;
     }
 
+    //Bunun bool değer döndürenini de oluştur ve auto-login için kullan
     //Daha sonra URL'yi methodu çağırırken yolla ki modüler tasarım olsun
     public bool Sender(string data) {
-        WebRequest request = WebRequest.Create(Login_URL);//Burası değişecek(localhost -> Esvolon)
+        WebRequest request = WebRequest.Create(Links.Login_URL);//Burası değişecek(localhost -> Esvolon)
         request.Method = "POST";
         xbyte = System.Text.Encoding.UTF8.GetBytes(data);
         request.ContentType = "application/json";

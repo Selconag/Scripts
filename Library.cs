@@ -38,12 +38,12 @@ namespace Library
         [SerializeField] public string security;
         //User id which created on the sign-up / Unique
         [SerializeField] public string user_id;
-        
+
     }
     [System.Serializable]
     public class Game
     {
-        
+
     }
 
     [System.Serializable]
@@ -59,11 +59,21 @@ namespace Library
         [SerializeField] public string yedi;
         [SerializeField] public string sekiz;
         //Rating question, answer will be taken as int
-        [SerializeField] public int puan = 1;
+        [SerializeField] public int puan = 0;
     }
     [System.Serializable]
     public class LastTest
     {
 
+    }
+
+    //Links we use in the app
+    public class Links
+    {
+        public const string Register_URL = "http://esvolon.uniqdesignfactory.com/api/users/register";//Can change later between(localhost -> Esvolon)
+        public const string Login_URL = "http://esvolon.uniqdesignfactory.com/api/users/login";
+        public const string ForgotPassword_URL = "http://esvolon.uniqdesignfactory.com/api/users/forgot-password";
+        public const string UserDetail_URL = "http://esvolon.uniqdesignfactory.com/api/users/user-detail";
+        public const string PreTest = "http://esvolon.uniqdesignfactory.com/api/users/giris-test";
     }
 }

@@ -14,16 +14,17 @@ public class Menus : MonoBehaviour
     public GameObject Connect;
     public GameObject Signin;
     public GameObject Login;
-    public GameObject StartTest;
     public GameObject PreTest;
+    //Pretest sub panel groups
+    public GameObject Start_Test_Panel;
     public GameObject User_Detail_Panel;
     public GameObject TestGroup;
     //Special Texts
     public Text QuestionTextPlace;
     //Variables
     private int i = 0;
-    private int buttonvalue = 1;
-    private string buttonstate;
+    private int buttonvalue = 0;
+    private string buttonstate = null;
     //Special Objects
     public GameObject YesNoButtonHolder;//Yes No Buttons
     public GameObject NumberButtonHolder;//For Rating Buttons
@@ -66,18 +67,15 @@ public class Menus : MonoBehaviour
 
     void Start()
     {
-        //ENABLE THIS LATER!!!
-        //Landing.SetActive(true);
-        //StartCoroutine(Landing_Fade());
+        QuestionTextPlace.text = Questions[i];
+        Landing.SetActive(true);
+        StartCoroutine(Landing_Fade());
 
         //Check IF a local save data is here
         D = GetComponent<Deserializer>();
         //If:Connect Button appears
 
         //Else:Connect button fades away
-
-        //ONLY TEST GroupY in here
-        QuestionTextPlace.text = Questions[i];
 
     }
     
@@ -112,7 +110,7 @@ public class Menus : MonoBehaviour
                 //Send data and open a connection if user is available
 
                 Connect.SetActive(false);
-                StartTest.SetActive(true);
+                Start_Test_Panel.SetActive(true);
             }
             else
             {
@@ -168,84 +166,92 @@ public class Menus : MonoBehaviour
 
     //UNCOMPLETED
     //Login button behaivour region from Signin Panel
+
+    //LOGİN KISMI İŞLEMLERİNİ YARIM BIRAKTIK!!!
     public void Login_Button()
     {
-        //If user inputs are fully given
-        if (EmailBox.text.Length > 0 && PasswordBox.text.Length > 0)
+        //If: We are on the sign-in page => Go to Login page
+        if (Signin.activeSelf)
         {
-            //If email contains both "."(dots) and "@"(at) chars, accept email 
-            if (((EmailBox.text).ToString()).Contains("@") && ((EmailBox.text).ToString()).Contains("."))
+            Signin.SetActive(false);
+            Login.SetActive(true);
+        }
+        //Else: Continue on process
+        else
+        {
+            //If user inputs are fully given
+            if (EmailBox.text.Length > 0 && PasswordBox.text.Length > 0)
             {
-                D.user.email = EmailBox.text.ToString();
-                D.user.password = PasswordBox.text.ToString();
-                //Do the login
-                D.BuildNewSerialization(D.user);
-                //IF pretest not made
-                if (D.user.modul == 0)
+                //If email contains both "."(dots) and "@"(at) chars, accept email 
+                if (((EmailBox.text).ToString()).Contains("@") && ((EmailBox.text).ToString()).Contains("."))
                 {
-                    Login.SetActive(false);
-                    PreTest.SetActive(true);
+                    D.user.email = EmailBox.text.ToString();
+                    D.user.password = PasswordBox.text.ToString();
+                    //Do the login
+                    D.BuildNewSerialization(D.user);
+                    //IF pretest not made
+                    if (D.user.modul == 0)
+                    {
+                        Login.SetActive(false);
+                        PreTest.SetActive(true);
+                    }
+                    //IF pretest made
+                    else
+                    {
+                        Login.SetActive(false);
+                        //GameScene Change
+                    }
                 }
-                //IF pretest made
                 else
                 {
-                    Login.SetActive(false);
-                    //GameScene Change
-                }                
+                    //Error: Email must be filled correct!
+                    //As an error message open a new panel with text on it
+                    //Disappear it after 0.5 minutes?
+                }
             }
             else
             {
-                //Error: Email must be filled correct!
+                //Error: All boxes must be filled!
                 //As an error message open a new panel with text on it
                 //Disappear it after 0.5 minutes?
+                //Texts are not disappeared
             }
+            EmailBox.text = "";
+            PasswordBox.text = "";
+        }
+        
+    }
+
+    //UNCOMPLETED
+    //Pre_Test Next button behaivour region from PreTest Panel
+    public void Tests_Next_Button()
+    {
+        if (Start_Test_Panel.activeSelf)//NEXT Butonuna tıklanınca
+        {
+            Start_Test_Panel.SetActive(false);
+            User_Detail_Panel.SetActive(true);
+            NextButton.SetActive(true);
+        }
+        //Sends User Details on first "next" button click
+        else if (User_Detail_Panel.activeSelf)//NEXT Butonuna tıklanınca
+        {
+            //Cevapları al ve gönder
+            D.user.age = Age.text.ToString();
+            D.user.country = Gender.text.ToString();
+            D.user.occupation = Occupation.text.ToString();
+            D.user.prof_exp = ProfExp.text.ToString();
+            D.user.security = D.con.security;
+            D.user.user_id = D.con.user_id;
+            D.BuildNewSerialization(D.user);
+            User_Detail_Panel.SetActive(false);
+            TestGroup.SetActive(true);
+            QuestionTextPlace.text = Questions[i];
         }
         else
         {
-            //Error: All boxes must be filled!
-            //As an error message open a new panel with text on it
-            //Disappear it after 0.5 minutes?
-            //Texts are not disappeared
-        }
-        EmailBox.text = "";
-        PasswordBox.text = "";
-    }
-
-    //UNCOMPLETED
-    //StartTest button behaivour region from StartPreTest Panel
-    public void StartTest_Button()
-    {
-        Button_Waiter();
-        StartTest.SetActive(false);
-        PreTest.SetActive(true);
-        QuestionTextPlace.text = Questions[i];
-
-    }
-
-    //UNCOMPLETED
-    //??? button behaivour region from PreTest Panel
-    public void Tests_Next_Button()
-    {
-        if (buttonstate != null || buttonvalue != 0) 
-        {
-            //Sends User Details on first "next" button click
-            if (User_Detail_Panel.activeSelf)//NEXT Butonuna tıklanınca
+            //Soruyu al
+            if (((buttonstate != "") && (buttonstate != null && buttonvalue == 0)) || (buttonstate == null && buttonvalue != 0))
             {
-                //Cevapları al ve gönder
-                D.user.age = Age.text.ToString();
-                D.user.country = Gender.text.ToString();
-                D.user.occupation = Occupation.text.ToString();
-                D.user.prof_exp = ProfExp.text.ToString();
-                D.user.security = D.con.security;
-                D.user.user_id = D.con.user_id;
-                D.BuildNewSerialization(D.user);
-                User_Detail_Panel.SetActive(false);
-                TestGroup.SetActive(true);
-            }
-            else
-            {
-                //Soruyu al
-                QuestionTextPlace.text = Questions[i];
                 switch (i)
                 {
                     //Sends answers based on which question we are on
@@ -282,27 +288,13 @@ public class Menus : MonoBehaviour
                 }
                 //Increment the counter to get next question
                 i++;
+                QuestionTextPlace.text = Questions[i];
             }
             buttonstate = null;
             buttonvalue = 0;
         }
         
     }
-
-    //Next button behaivour region from all Pretest Panels
-    public void Next_Button()
-    {
-        if (User_Detail_Panel)
-        {
-
-        }
-        else
-        {
-
-        }
-        NextButton.SetActive(true);
-    }
-
 
 
 /*
@@ -344,11 +336,13 @@ public class Menus : MonoBehaviour
 
         yield return 0;
     }
+    //COMPLETED!!
     //Pre-Test rating value taker
     public void RatingButtonValueTaker(int button)
     {
         buttonvalue = button;
     }
+    //COMPLETED!!
     //PreTest Yes-No value Taker
     public void YesNoButtonValueTaker(bool button)
     {
@@ -361,6 +355,54 @@ public class Menus : MonoBehaviour
             buttonstate = "No";
         }
         
+    }
+    //It will take the number of page the app on
+    //Sends it to the method and then sets the active page with a
+    //switch case operation
+    public void Back_Button(int button)
+    {
+        switch (button)
+        {
+            //From Signin to Connect Page
+            case 1:
+                Signin.SetActive(false);
+                Connect.SetActive(true);
+                break;
+            //From Signin to login Page
+            case 2:
+                Login.SetActive(false);
+                Signin.SetActive(true);
+                break;
+            //From pretest to Login Page
+            case 3:
+                if (TestGroup.activeSelf)
+                {
+                    i--;
+                    QuestionTextPlace.text = Questions[i];
+                }
+                else if (TestGroup.activeSelf && i==0)
+                {
+                    User_Detail_Panel.SetActive(true);
+                    PreTest.SetActive(false);
+                }
+                else
+                {
+                    Start_Test_Panel.SetActive(true);
+                    User_Detail_Panel.SetActive(false);
+                }
+                //WILL ADD LATER - FOR NOW WRONG IMPLEMENTATION
+                //PreTest.SetActive(false);
+                //Login.SetActive(true);
+                break;
+            //Char Selection Page
+            case 4:
+                //Char Selection to Connect screen
+                break;
+            //Game Screen page
+            case 5:
+                //Game Screen to char selection screen
+                break;
+        }
     }
 
 }

@@ -38,7 +38,16 @@ namespace Library
         [SerializeField] public string security;
         //User id which created on the sign-up / Unique
         [SerializeField] public string user_id;
-
+        //Check if user details are entered
+        [SerializeField] public int user_detay = 0;
+        //Check if pre tests made
+        [SerializeField] public int giris_test = 0;
+        //Check if final tests made
+        [SerializeField] public int final_test = 0;
+        //Check which modul the client is on
+        [SerializeField] public int modul = 0;
+        //Check if character is selected
+        [SerializeField] public int karakter = 0;
     }
     [System.Serializable]
     public class Game
@@ -74,6 +83,7 @@ namespace Library
         public const string Login_URL = "http://esvolon.uniqdesignfactory.com/api/users/login";
         public const string ForgotPassword_URL = "http://esvolon.uniqdesignfactory.com/api/users/forgot-password";
         public const string UserDetail_URL = "http://esvolon.uniqdesignfactory.com/api/users/user-detail";
-        public const string PreTest = "http://esvolon.uniqdesignfactory.com/api/users/giris-test";
+        public const string PreTest_URL = "http://esvolon.uniqdesignfactory.com/api/users/giris-test";
+        public const string GetUser_URL = "https://esvolon.uniqdesignfactory.com/api/users/get-user";
     }
 }

@@ -7,7 +7,6 @@ using Library;
 public class Menus : MonoBehaviour
 {
     //Other Classes
-
     Deserializer D;
     //UI Panels of Menu
     public GameObject Landing;
@@ -39,15 +38,17 @@ public class Menus : MonoBehaviour
     public Text NameBox;
     public Text EmailBox;
     public Text PasswordBox;
+    public Text EmailBox_Login;
+    public Text PasswordBox_Login;
     //TextBoxes of PreTest User Details
     public Text Age;
     public Text Gender;
     public Text Occupation;
     public Text ProfExp;
-
+    //Error Panel
+    public GameObject ErrorPanel;
+    public Text ErrorText;
     //Game Scene
-    
-    //Classes
 
     //Questions that will be used in Pre-Test
     //1-8 Questions will take Yes/No
@@ -70,157 +71,15 @@ public class Menus : MonoBehaviour
         QuestionTextPlace.text = Questions[i];
         Landing.SetActive(true);
         StartCoroutine(Landing_Fade());
-
         //Check IF a local save data is here
         D = GetComponent<Deserializer>();
+        //UNCOMPLETED
         //If:Connect Button appears
 
         //Else:Connect button fades away
 
     }
-    
-    //COMPLETED!!
-    //Play button behaivour region from Connect Panel
-    public void Play_Button()
-    {
-        Button_Waiter();
-        Connect.SetActive(false);
-        Signin.SetActive(true);
-    }
 
-    //UNCOMPLETED
-    //Connect button behaivour region from Connect Panel
-    //Reads local Connection.json data and gets 2 variables
-    //gets user_id and security, sends the data and auto-connects to server
-    //then logs-in to app and continues on where the person left
-    public void Connect_Button()
-    {
-        //Serialization
-        string Local_User = D.GetLocalUserData();
-        Button_Waiter();
-        if (!(Local_User ==  "No"))
-        {
-            Connect.SetActive(false);
-            /*
-             If user not made pre-test before -> Go to PreTest
-             Else user made pre-test before -> Go to Game
-             */
-            if (Local_User.Contains("modul:0"))
-            {
-                //Send data and open a connection if user is available
-
-                Connect.SetActive(false);
-                Start_Test_Panel.SetActive(true);
-            }
-            else
-            {
-                Connect.SetActive(false); //FOR NOW!!
-                SceneManager.LoadScene("Basketbol");
-            }
-        }
-        else
-        {
-            //There is no Local save please first log in
-        }
-        
-    }
-
-    //UNCOMPLETED
-    //Signin button behaivour region from Signin Panel
-    public void Signin_Button()
-    {
-        //If user inputs are fully given
-        if (NameBox.text.Length > 0 && EmailBox.text.Length > 0 && PasswordBox.text.Length > 0)
-        {
-            //If email contains both "."(dots) and "@"(at) chars, accept email 
-            if (((EmailBox.text).ToString()).Contains("@") && ((EmailBox.text).ToString()).Contains("."))
-            {
-                D.user.name = NameBox.text.ToString();
-                D.user.email = EmailBox.text.ToString();
-                D.user.password = PasswordBox.text.ToString();
-                //send data to server
-                D.BuildNewSerialization(D.user);
-            }
-            else
-            {
-                //Error: Email must be filled correct!
-                //As an error message open a new panel with text on it
-                //Disappear it after 0.5 minutes?
-            }
-
-        }
-        else
-        {
-            //Error: All boxes must be filled!
-            //As an error message open a new panel with text on it
-            //Disappear it after 0.5 minutes?
-            //Texts are not disappeared
-        }
-        NameBox.text = "";
-        EmailBox.text = "";
-        PasswordBox.text = "";
-        //
-        Signin.SetActive(false);
-        Connect.SetActive(true);
-    }
-
-    //UNCOMPLETED
-    //Login button behaivour region from Signin Panel
-
-    //LOGİN KISMI İŞLEMLERİNİ YARIM BIRAKTIK!!!
-    public void Login_Button()
-    {
-        //If: We are on the sign-in page => Go to Login page
-        if (Signin.activeSelf)
-        {
-            Signin.SetActive(false);
-            Login.SetActive(true);
-        }
-        //Else: Continue on process
-        else
-        {
-            //If user inputs are fully given
-            if (EmailBox.text.Length > 0 && PasswordBox.text.Length > 0)
-            {
-                //If email contains both "."(dots) and "@"(at) chars, accept email 
-                if (((EmailBox.text).ToString()).Contains("@") && ((EmailBox.text).ToString()).Contains("."))
-                {
-                    D.user.email = EmailBox.text.ToString();
-                    D.user.password = PasswordBox.text.ToString();
-                    //Do the login
-                    D.BuildNewSerialization(D.user);
-                    //IF pretest not made
-                    if (D.user.modul == 0)
-                    {
-                        Login.SetActive(false);
-                        PreTest.SetActive(true);
-                    }
-                    //IF pretest made
-                    else
-                    {
-                        Login.SetActive(false);
-                        //GameScene Change
-                    }
-                }
-                else
-                {
-                    //Error: Email must be filled correct!
-                    //As an error message open a new panel with text on it
-                    //Disappear it after 0.5 minutes?
-                }
-            }
-            else
-            {
-                //Error: All boxes must be filled!
-                //As an error message open a new panel with text on it
-                //Disappear it after 0.5 minutes?
-                //Texts are not disappeared
-            }
-            EmailBox.text = "";
-            PasswordBox.text = "";
-        }
-        
-    }
 
     //UNCOMPLETED
     //Pre_Test Next button behaivour region from PreTest Panel
@@ -293,29 +152,211 @@ public class Menus : MonoBehaviour
             buttonstate = null;
             buttonvalue = 0;
         }
-        
+
     }
 
 
-/*
-    IEnumerator Dialog()
+    //COMPLETED!!
+    //Play button behaivour region from Connect Panel
+    public void Play_Button()
     {
-        // ...
-        var waitForButtonYesNo = new WaitForUIButtons(yesButton, noButton).ReplaceCallback(b => Debug.Log("Button with name " + b.name + " got pressed"));
-        yield return waitForButtonYesNo.Reset();
-        if (waitForButtonYesNo.PressedButton == yesButton)
-        {
-            // yes was pressed
-            Next_Button();
+        Button_Waiter();
+        Connect.SetActive(false);
+        Signin.SetActive(true);
+    }
 
+
+    //HALF COMPLETED ! NEED TO BE CHECKED
+    //Connect button behaivour region from Connect Panel
+    //Reads local Connection.json data and gets 2 variables
+    //gets user_id and security, sends the data and auto-connects to server
+    //then logs-in to app and continues on where the person left
+    public void Connect_Button()
+    {
+        //Get local Data
+        string Local_User = D.GetLocalUserData();
+        Button_Waiter();
+        if (!(Local_User == "No"))
+        {
+            Connect.SetActive(false);
+            /*
+             If user not made pre-test before -> Go to PreTest
+             Else user made pre-test before -> Go to Game
+             */
+            if (Local_User.Contains("user_detay:1"))
+            {
+                if (Local_User.Contains("giris_test:1"))
+                {
+                    //Go to game scene
+                    SceneManager.LoadScene("Basketbol");
+                }
+                else
+                {
+                    //Go to pretest
+                    PreTest.SetActive(true);
+                    TestGroup.SetActive(true);
+                }
+            }
+            else
+            {
+                //Go to user_detail panel
+                PreTest.SetActive(true);
+                Start_Test_Panel.SetActive(true);
+            }
         }
         else
         {
-            // no was pressed
-            NextButton.SetActive(true);
+            //There is no Local save please first log in
+            StartCoroutine(ErrorButton_Waiter());
+        }
+
+    }
+
+    //HALF COMPLETED ! NEED TO BE CHECKED
+    //Signin button behaivour region from Signin Panel
+    public void Signin_Button()
+    {
+        //If: We are on the login page => Go to Signin page
+        if (!Signin.activeSelf)
+        {
+            Signin.SetActive(true);
+            Login.SetActive(false);
+        }
+        //If user inputs are fully given
+        if (NameBox.text.Length > 0 && EmailBox.text.Length > 0 && PasswordBox.text.Length > 0)
+        {
+            //If email contains both "."(dots) and "@"(at) chars, accept email 
+            if (((EmailBox.text).ToString()).Contains("@") && ((EmailBox.text).ToString()).Contains("."))
+            {
+                D.user.name = NameBox.text.ToString();
+                D.user.email = EmailBox.text.ToString();
+                D.user.password = PasswordBox.text.ToString();
+                //send data to server
+                D.BuildNewSerialization(D.user);
+            }
+            else
+            {
+                //Error: Email must be filled correct!
+                //As an error message open a new panel with text on it
+                ErrorText.text = "Email area must be filled correctly!";
+                StartCoroutine(ErrorButton_Waiter());
+            }
+        }
+        else
+        {
+            //Error: All boxes must be filled!
+            //As an error message open a new panel with text on it
+            ErrorText.text = "All areas must be filled!";
+            StartCoroutine(ErrorButton_Waiter());
+        }
+        NameBox.text = "";
+        EmailBox.text = "";
+        PasswordBox.text = "";
+    }
+
+    //HALF COMPLETED ! LAST CHECKS WILL BE MADE SOON
+    //Login button behaivour region from Signin Panel
+    public void Login_Button()
+    {
+        //If: We are on the sign-in page => Go to Login page
+        if (Signin.activeSelf)
+        {
+            Signin.SetActive(false);
+            Login.SetActive(true);
+        }
+        //Else: Continue on process
+        else
+        {   
+            //If user inputs are fully given
+            if (EmailBox_Login.text.Length > 0 && PasswordBox_Login.text.Length > 0)
+            {
+                //If email contains both "."(dots) and "@"(at) chars, accept email 
+                if (((EmailBox_Login.text).ToString()).Contains("@") && ((EmailBox_Login.text).ToString()).Contains("."))
+                {
+                    D.user.email = EmailBox_Login.text.ToString();
+                    D.user.password = PasswordBox_Login.text.ToString();
+                    //Do the login
+                    D.LoginManuel(D.user);
+                    //MİLLETİANS AT WORK !!
+                    //At here the system will get user info to know which page must direct the client
+                    string X = D.GetLocalUserData();
+                    //string X = "";
+                    if (!(X == "No"))
+                    {
+                        Login.SetActive(false);
+                        /*
+                         If user not made pre-test before -> Go to PreTest
+                         Else user made pre-test before -> Go to Game
+                         */
+                        if (X.Contains("user_detay:1"))
+                        {
+                            //NOTICE: LATER IMPLEMENTATIONS WITH MODULS WILL ADDED LATER
+                            //If User is on modul 0
+                            if (X.Contains("giris_test:1"))
+                            {
+                                //Go to game scene
+                                SceneManager.LoadScene("Basketbol");
+                            }
+                            else
+                            {
+                                //Go to pretest
+                                PreTest.SetActive(true);
+                                TestGroup.SetActive(true);
+                            }
+                        }
+                        else
+                        {
+                            //Go to user_detail panel
+                            PreTest.SetActive(true);
+                            Start_Test_Panel.SetActive(true);
+                        }
+                    }
+                    else
+                    {
+                        //There is no Local save please first log in
+                        StartCoroutine(ErrorButton_Waiter());
+                    }
+                }
+                else
+                {
+                    //Error: Email must be filled correct!
+                    //As an error message open a new panel with text on it
+                    ErrorText.text = "Email area must be filled correctly!";
+                    StartCoroutine(ErrorButton_Waiter());
+                }
+            }
+            else
+            {
+                //Error: All boxes must be filled!
+                //As an error message open a new panel with text on it
+                ErrorText.text = "All areas must be filled!";
+                StartCoroutine(ErrorButton_Waiter());
+            }
+            EmailBox_Login.text = "";
+            PasswordBox_Login.text = "";
         }
     }
-*/
+
+
+    /*
+        IEnumerator Dialog()
+        {
+            // ...
+            var waitForButtonYesNo = new WaitForUIButtons(yesButton, noButton).ReplaceCallback(b => Debug.Log("Button with name " + b.name + " got pressed"));
+            yield return waitForButtonYesNo.Reset();
+            if (waitForButtonYesNo.PressedButton == yesButton)
+            {
+                // yes was pressed
+                Next_Button();
+
+            }
+            else
+            {
+                // no was pressed
+                NextButton.SetActive(true);
+            }
+        }
+    */
     //COMPLETED!!
     //Waits half minute for smooth transition
     //It will be used in 2 different operations
@@ -324,6 +365,15 @@ public class Menus : MonoBehaviour
     IEnumerator Button_Waiter()
     {
         yield return new WaitForSeconds(0.5f);
+    }
+
+    //Error Button wait
+    IEnumerator ErrorButton_Waiter()
+    {
+        ErrorPanel.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        ErrorPanel.SetActive(false);
+        yield return new WaitForSeconds(0.1f);
     }
     //COMPLETED!!
     //Landing page's waiting effect method
@@ -356,6 +406,7 @@ public class Menus : MonoBehaviour
         }
         
     }
+    //UNCOMPLETED
     //It will take the number of page the app on
     //Sends it to the method and then sets the active page with a
     //switch case operation

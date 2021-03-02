@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿
+//NOTES:Sender mesage for UnityWebRequest. An old implementation. Do not use UnityWebRequest class and methods. Instead of Unity's WebRequest please use
+//.NET Core Web Request class and its methods
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
@@ -30,25 +34,14 @@ public class Deserializer : MonoBehaviour
     public Connection con = new Connection();
     public PreTest pre = new PreTest();
 
-    //API Connection url addresses for the application
-    
-    //Sender mesage for UnityWebRequest. An old implementation.
+    //API Connection url addresses are in the Library.cs
+
     private string sendermessage;
 
     void Start()
     {
        
     }
-    //Used for Json Deserialization
-
-    //public void DestroySerialization()
-    //{
-
-    //    Ujson = JsonUtility.ToJson(user) ?? "";
-    //    System.IO.File.WriteAllText(path, Ujson);
-    //    Debug.Log("Written file is:" + Ujson);
-    //    //return json;
-    //}
     public void BuildNewSerialization(User user1)
     {
         Ujson = JsonUtility.ToJson(user1) ?? "";
@@ -61,39 +54,12 @@ public class Deserializer : MonoBehaviour
     public void LoginManuel(User user1)
     {
         Ujson = JsonUtility.ToJson(user1) ?? "";
-        Sender(Ujson);
-        con = JsonUtility.FromJson<Connection>(Cjson);
+        Modular_Data_Sender(Ujson, 1);
+        Cjson = JsonUtility.ToJson(con) ?? "";
+        //Below may wrong implemented, will look detailed later
+        //con = JsonUtility.FromJson<Connection>(Cjson);
         System.IO.File.WriteAllText(Cpath, Cjson);
-        //return json;
-    }
-
-    //Used for AutoLogin
-
-    public bool AutoLogin()
-    {
-        Cjson = System.IO.File.ReadAllText(Cpath);
-        con = JsonUtility.FromJson<Connection>(Cjson);
-        return true;
-    }
-    
-    //Used for Json Serialization
-    public void SendTestData(PreTest test)
-    {
-        Cjson = System.IO.File.ReadAllText(Cpath);
-        Tjson = JsonUtility.ToJson(test) ?? "";
-        Sender(Cjson+Tjson);
-
-    }
-    //User Serializer
-    public void BuildSerialization(User user1)
-    {
-        user1 = JsonUtility.FromJson<User>(Ujson);
-    }
-    //Connection Serializer
-    public void BuildSerialization(Connection conn1)
-    {
-        conn1 = JsonUtility.FromJson<Connection>(Cjson);
-        ///return conn1;
+        //return Ujson;
     }
 
     //COMPLETED!!
@@ -117,8 +83,30 @@ public class Deserializer : MonoBehaviour
             Debug.Log("No files exist! Please Log-in first");
             return "No";
         }
-        
+
     }
+    
+    //Used for Json Serialization
+    public void SendTestData(PreTest test)
+    {
+        Cjson = System.IO.File.ReadAllText(Cpath);
+        Tjson = JsonUtility.ToJson(test) ?? "";
+        Sender(Cjson+Tjson);
+
+    }
+    //User Serializer
+    public void BuildSerialization(User user1)
+    {
+        user1 = JsonUtility.FromJson<User>(Ujson);
+    }
+    //Connection Serializer
+    public void BuildSerialization(Connection conn1)
+    {
+        conn1 = JsonUtility.FromJson<Connection>(Cjson);
+        ///return conn1;
+    }
+
+    
     //Starts Data Connection
     public void Data_Connection()
     {
@@ -195,7 +183,7 @@ public class Deserializer : MonoBehaviour
 
     //Bunun bool değer döndürenini de oluştur ve auto-login için kullan
     //Daha sonra URL'yi methodu çağırırken yolla ki modüler tasarım olsun
-    public bool Sender(string data) {
+    public string Sender(string data) {
         WebRequest request = WebRequest.Create(Links.Login_URL);//Burası değişecek(localhost -> Esvolon)
         request.Method = "POST";
         xbyte = System.Text.Encoding.UTF8.GetBytes(data);
@@ -214,8 +202,61 @@ public class Deserializer : MonoBehaviour
             string responseFromServer = reader.ReadToEnd();
             JsonUtility.FromJsonOverwrite(responseFromServer, con);
             Console.WriteLine(responseFromServer);
+            
         }
         response.Close();
-        return true;
+        return "";
+
+    }
+
+    //MODULAR TESTED DATA SENDER and GETTER
+    public void Modular_Data_Sender(string data,int state)
+    {
+        string URL;
+        switch (state)
+        {
+            case 0:
+                URL = Links.Register_URL;
+                break;
+            case 1:
+                URL = Links.Login_URL;
+                break;
+            case 2:
+                URL = Links.ForgotPassword_URL;
+                break;
+            case 3:
+                URL = Links.UserDetail_URL;
+                break;
+            case 4:
+                URL = Links.PreTest_URL;
+                break;
+            case 5:
+                URL = Links.GetUser_URL;
+                break;
+            default:
+                URL = Links.GetUser_URL;
+                break;
+        }
+        WebRequest request = WebRequest.Create(URL);
+        request.Method = "POST";
+        xbyte = System.Text.Encoding.UTF8.GetBytes(data);
+        request.ContentType = "application/json";
+        request.ContentLength = xbyte.Length;
+        Stream dataStream = request.GetRequestStream();
+        dataStream.Write(xbyte, 0, xbyte.Length);
+        dataStream.Close();
+
+        WebResponse response = request.GetResponse();
+        Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+
+        using (dataStream = response.GetResponseStream())
+        {
+            StreamReader reader = new StreamReader(dataStream);
+            string responseFromServer = reader.ReadToEnd();
+            JsonUtility.FromJsonOverwrite(responseFromServer, con);
+            Console.WriteLine(responseFromServer);
+        }
+        response.Close();
+
     }
 }

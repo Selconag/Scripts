@@ -69,6 +69,15 @@ public class Menus : MonoBehaviour
         "What do you think about your level of knowledge and skills in social innovation and leadership in sports?"
     };
 
+    private void Update()
+    {
+        //UNCOMPLETED
+        //Check IF a local save data is here
+        //If:Connect Button appears
+
+        //Else:Connect button fades away
+    }
+
     void Start()
     {
         QuestionTextPlace.text = Questions[i];
@@ -76,10 +85,7 @@ public class Menus : MonoBehaviour
         StartCoroutine(Landing_Fade());
         //Check IF a local save data is here
         D = GetComponent<DataServices>();
-        //UNCOMPLETED
-        //If:Connect Button appears
-
-        //Else:Connect button fades away
+        
 
     }
 

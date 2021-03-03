@@ -2,6 +2,7 @@
 //Classes are stored in here and all of their variables
 namespace Library
 {
+    //Used for storing and sending user info variables
     [System.Serializable]
     public class User
     {
@@ -31,6 +32,9 @@ namespace Library
         //Is user finished Pre-Test?
         [SerializeField] public int modul = 0;
     }
+    //Auto connection and many other details
+    //pre tested for security leaks
+    //further tests will be needed
     [System.Serializable]
     public class Connection
     {
@@ -49,16 +53,35 @@ namespace Library
         //Check if character is selected
         [SerializeField] public int karakter = 0;
     }
+    //Class of game inputs
     [System.Serializable]
     public class Game
     {
 
+
+        //Check how many game tokens player has
+        //Gametokens are used in mini games like ammunition in a weapon
+        //As in basketball every token equals to a free throw
+        [SerializeField] public int tokens = 0;
+
+
+        //Total score is calculated as a game win condition
+        /*
+         * If the player reaches enough score, next game will be unlocked
+        Basketball: 20 points => Shot Put
+        Shot Put: 40 points => Javelin Throw
+        Javelin Throw: 60 points => Archery
+        Archery: 80 points => Long Jump
+        Long Jump: 100 points => Final Test
+         */
+        //After final test is done the client gets his/hers reward for completing the course
+        [SerializeField] public int total_score = 0;
     }
 
     [System.Serializable]
     public class PreTest
     {
-        //Fİrst 8 questions, Y/N answers will be taken as string
+        //First 8 questions, Y/N answers will be taken as string
         [SerializeField] public string bir;
         [SerializeField] public string iki;
         [SerializeField] public string uc;
@@ -76,8 +99,7 @@ namespace Library
 
     }
 
-    //ON TESTING RIGHT NOW DONT PLAY WOTH CODES7
-    //ONLY USED FOR FORGOT PASSWORD EVENT
+    //Only used for "forgot my password" event 
     [System.Serializable]
     public class Email
     {
@@ -85,7 +107,7 @@ namespace Library
         [SerializeField] public string email;
     }
 
-    //Links we use in the app
+    //Api Links we use in the app
     public class Links
     {
         public const string Register_URL = "http://esvolon.uniqdesignfactory.com/api/users/register";//Can change later between(localhost -> Esvolon)

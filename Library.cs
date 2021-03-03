@@ -76,6 +76,15 @@ namespace Library
 
     }
 
+    //ON TESTING RIGHT NOW DONT PLAY WOTH CODES7
+    //ONLY USED FOR FORGOT PASSWORD EVENT
+    [System.Serializable]
+    public class Email
+    {
+        //E-mail defined by user / Unique
+        [SerializeField] public string email;
+    }
+
     //Links we use in the app
     public class Links
     {

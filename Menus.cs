@@ -35,20 +35,23 @@ public class Menus : MonoBehaviour
     public Image Rainbow2;
     public GameObject NextButton;
     //TextBoxes of Sign-in/Login
-    public Text NameBox;
-    public Text EmailBox;
-    public Text PasswordBox;
-    public Text EmailBox_Login;
-    public Text PasswordBox_Login;
+    public InputField NameBox;
+    public InputField EmailBox;
+    public InputField PasswordBox;
+    public InputField EmailBox_Login;
+    public InputField PasswordBox_Login;
     //TextBoxes of PreTest User Details
-    public Text Age;
-    public Text Gender;
-    public Text Occupation;
-    public Text ProfExp;
+    public InputField Age;
+    public InputField Gender;
+    public InputField Occupation;
+    public InputField ProfExp;
     //Error Panel
     public GameObject ErrorPanel;
     public Text ErrorText;
     //Game Scene
+
+    //TESTING NEW OUTCOMES
+    
 
     //Questions that will be used in Pre-Test
     //1-8 Questions will take Yes/No
@@ -80,6 +83,15 @@ public class Menus : MonoBehaviour
 
     }
 
+    //COMPLETED!!
+    //Forgot password sends email to the server
+    //the rest is up to server
+    //Calls a ForgotPassword method from DataService
+    public void ForgotPasswordButton()
+    {
+        D.mail.email = EmailBox_Login.text.ToString();
+        D.ForgotPassword(D.mail);
+    }
 
     //UNCOMPLETED
     //Pre_Test Next button behaivour region from PreTest Panel
@@ -164,7 +176,7 @@ public class Menus : MonoBehaviour
         Connect.SetActive(false);
         Signin.SetActive(true);
     }
-
+    
 
     //HALF COMPLETED ! NEED TO BE CHECKED
     //Connect button behaivour region from Connect Panel
@@ -233,6 +245,10 @@ public class Menus : MonoBehaviour
                 D.user.password = PasswordBox.text.ToString();
                 //send data to server
                 D.BuildNewSerialization(D.user);
+
+                NameBox.text = "";
+                EmailBox.text = "";
+                PasswordBox.text = "";
             }
             else
             {
@@ -249,9 +265,7 @@ public class Menus : MonoBehaviour
             ErrorText.text = "All areas must be filled!";
             StartCoroutine(ErrorButton_Waiter());
         }
-        NameBox.text = "";
-        EmailBox.text = "";
-        PasswordBox.text = "";
+
     }
 
     //HALF COMPLETED ! LAST CHECKS WILL BE MADE SOON
@@ -337,26 +351,6 @@ public class Menus : MonoBehaviour
         }
     }
 
-
-    /*
-        IEnumerator Dialog()
-        {
-            // ...
-            var waitForButtonYesNo = new WaitForUIButtons(yesButton, noButton).ReplaceCallback(b => Debug.Log("Button with name " + b.name + " got pressed"));
-            yield return waitForButtonYesNo.Reset();
-            if (waitForButtonYesNo.PressedButton == yesButton)
-            {
-                // yes was pressed
-                Next_Button();
-
-            }
-            else
-            {
-                // no was pressed
-                NextButton.SetActive(true);
-            }
-        }
-    */
     //COMPLETED!!
     //Waits half minute for smooth transition
     //It will be used in 2 different operations
@@ -456,4 +450,24 @@ public class Menus : MonoBehaviour
         }
     }
 
+    //NOT USED PART, SAVED FOR REFERENCE
+    /*
+        IEnumerator Dialog()
+        {
+            // ...
+            var waitForButtonYesNo = new WaitForUIButtons(yesButton, noButton).ReplaceCallback(b => Debug.Log("Button with name " + b.name + " got pressed"));
+            yield return waitForButtonYesNo.Reset();
+            if (waitForButtonYesNo.PressedButton == yesButton)
+            {
+                // yes was pressed
+                Next_Button();
+
+            }
+            else
+            {
+                // no was pressed
+                NextButton.SetActive(true);
+            }
+        }
+    */
 }

@@ -33,10 +33,17 @@ public class DataServices : MonoBehaviour
     public User user = new User();
     public Connection con = new Connection();
     public PreTest pre = new PreTest();
+    public Email mail = new Email();
 
     //API Connection url addresses are in the Library.cs
 
     private string sendermessage;
+
+    //Helper method of ForgotPasswordButton method from Menus
+    public void ForgotPassword(Email email)
+    {
+        Modular_Data_Sender(JsonUtility.ToJson(email) ?? "", 2);
+    }
 
     void Start()
     {
@@ -167,7 +174,7 @@ public class DataServices : MonoBehaviour
             case 1:
                 URL = Links.Login_URL;
                 break;
-            //NOT YET IMPLEMENTED
+            //STILL ON TEST
             case 2:
                 URL = Links.ForgotPassword_URL;
                 break;

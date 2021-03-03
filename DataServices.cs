@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using System.Net.Http;
 //Library is our resource class for object classes
 using Library;
-public class Deserializer : MonoBehaviour
+public class DataServices : MonoBehaviour
 {
     //User class data taker
     private string Ujson;
@@ -45,10 +45,9 @@ public class Deserializer : MonoBehaviour
     public void BuildNewSerialization(User user1)
     {
         Ujson = JsonUtility.ToJson(user1) ?? "";
-        StartCoroutine(Upload(Ujson));
+        Modular_Data_Sender(Ujson, 0);
         BuildSerialization(con);
         System.IO.File.WriteAllText(Cpath, Cjson);
-        //return json;
     }
     //Used For Manual Login
     public void LoginManuel(User user1)
@@ -66,6 +65,7 @@ public class Deserializer : MonoBehaviour
     //get Local Connection Data
     //if data exists return data as string
     //else return "No" as string
+    //connectıon data is used for AUTO-LOGIN process
     public string GetLocalUserData()
     {
         //check if file is available
@@ -86,12 +86,13 @@ public class Deserializer : MonoBehaviour
 
     }
     
-    //Used for Json Serialization
+    //Used Only for Sending Pre-Test Questions Data
     public void SendTestData(PreTest test)
     {
         Cjson = System.IO.File.ReadAllText(Cpath);
         Tjson = JsonUtility.ToJson(test) ?? "";
-        Sender(Cjson+Tjson);
+        //Send Pre-test Data
+        Modular_Data_Sender(Cjson+Tjson,4);
 
     }
     //User Serializer
@@ -105,14 +106,9 @@ public class Deserializer : MonoBehaviour
         conn1 = JsonUtility.FromJson<Connection>(Cjson);
         ///return conn1;
     }
-
     
-    //Starts Data Connection
-    public void Data_Connection()
-    {
-        StartCoroutine(Upload());
-    }
-    
+    //NON USED PROTOTYPE FOR FURTHER USAGE
+    //OTHER PROTOTYPES UPGRADED VERSION OF THIS CODE
     IEnumerator Upload()
     {
         WebRequest request = WebRequest.Create(Links.Register_URL);//Burası değişecek(localhost -> Esvolon)
@@ -155,59 +151,9 @@ public class Deserializer : MonoBehaviour
         response.Close();
         yield return 0;
     }
-    
-    IEnumerator Upload(string data)
-    {
-        WebRequest request = WebRequest.Create(Links.Register_URL);//Burası değişecek(localhost -> Esvolon)
-        request.Method = "POST";
-        xbyte = System.Text.Encoding.UTF8.GetBytes(data);
-        request.ContentType = "application/json";
-        request.ContentLength = xbyte.Length;
-        Stream dataStream = request.GetRequestStream();
-        dataStream.Write(xbyte, 0, xbyte.Length);
-        dataStream.Close();
-
-        WebResponse response = request.GetResponse();
-        Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-
-        using (dataStream = response.GetResponseStream())
-        {
-            StreamReader reader = new StreamReader(dataStream);
-            string responseFromServer = reader.ReadToEnd();
-            JsonUtility.FromJsonOverwrite(responseFromServer, con);
-            Console.WriteLine(responseFromServer);
-        }
-        response.Close();
-        yield return 0;
-    }
 
     //Bunun bool değer döndürenini de oluştur ve auto-login için kullan
     //Daha sonra URL'yi methodu çağırırken yolla ki modüler tasarım olsun
-    public string Sender(string data) {
-        WebRequest request = WebRequest.Create(Links.Login_URL);//Burası değişecek(localhost -> Esvolon)
-        request.Method = "POST";
-        xbyte = System.Text.Encoding.UTF8.GetBytes(data);
-        request.ContentType = "application/json";
-        request.ContentLength = xbyte.Length;
-        Stream dataStream = request.GetRequestStream();
-        dataStream.Write(xbyte, 0, xbyte.Length);
-        dataStream.Close();
-
-        WebResponse response = request.GetResponse();
-        Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-        
-        using (dataStream = response.GetResponseStream())
-        {
-            StreamReader reader = new StreamReader(dataStream);
-            string responseFromServer = reader.ReadToEnd();
-            JsonUtility.FromJsonOverwrite(responseFromServer, con);
-            Console.WriteLine(responseFromServer);
-            
-        }
-        response.Close();
-        return "";
-
-    }
 
     //MODULAR TESTED DATA SENDER and GETTER
     public void Modular_Data_Sender(string data,int state)
@@ -221,15 +167,18 @@ public class Deserializer : MonoBehaviour
             case 1:
                 URL = Links.Login_URL;
                 break;
+            //NOT YET IMPLEMENTED
             case 2:
                 URL = Links.ForgotPassword_URL;
                 break;
+            //NOT YET IMPLEMENTED
             case 3:
                 URL = Links.UserDetail_URL;
                 break;
             case 4:
                 URL = Links.PreTest_URL;
                 break;
+            //NOT YET IMPLEMENTED
             case 5:
                 URL = Links.GetUser_URL;
                 break;

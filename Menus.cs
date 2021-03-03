@@ -7,7 +7,7 @@ using Library;
 public class Menus : MonoBehaviour
 {
     //Other Classes
-    Deserializer D;
+    DataServices D;
     //UI Panels of Menu
     public GameObject Landing;
     public GameObject Connect;
@@ -72,7 +72,7 @@ public class Menus : MonoBehaviour
         Landing.SetActive(true);
         StartCoroutine(Landing_Fade());
         //Check IF a local save data is here
-        D = GetComponent<Deserializer>();
+        D = GetComponent<DataServices>();
         //UNCOMPLETED
         //If:Connect Button appears
 

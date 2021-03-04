@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Library;
+using System.IO;
 public class Menus : MonoBehaviour
 {
     //Other Classes
@@ -27,13 +28,15 @@ public class Menus : MonoBehaviour
     //Special Objects
     public GameObject YesNoButtonHolder;//Yes No Buttons
     public GameObject NumberButtonHolder;//For Rating Buttons
+    public GameObject NextButton;
+    public GameObject ConnectButton;
     //Buttons
     public Button yesButton;
     public Button noButton;
     //Images
     public Image Rainbow;
     public Image Rainbow2;
-    public GameObject NextButton;
+    
     //TextBoxes of Sign-in/Login
     public InputField NameBox;
     public InputField EmailBox;
@@ -48,10 +51,6 @@ public class Menus : MonoBehaviour
     //Error Panel
     public GameObject ErrorPanel;
     public Text ErrorText;
-    //Game Scene
-
-    //TESTING NEW OUTCOMES
-    
 
     //Questions that will be used in Pre-Test
     //1-8 Questions will take Yes/No
@@ -71,21 +70,45 @@ public class Menus : MonoBehaviour
 
     private void Update()
     {
-        //UNCOMPLETED
-        //Check IF a local save data is here
+        //COMPLETED!
+        //Check IF a local save data is here    
         //If:Connect Button appears
-
-        //Else:Connect button fades away
+        if (Connect.activeSelf) 
+        {
+            if (File.Exists(DataServices.Game_Path + "/ConnectionData.json"))
+            {
+                //If a save data comes later or available at start
+                ConnectButton.SetActive(true);
+            }
+            //Else:Connect button fades away
+            else
+            {
+                //Disable Connect Button
+                ConnectButton.SetActive(false);
+            }
+        }
     }
 
     void Start()
     {
+        //Load first question to Questions Array for pretest
         QuestionTextPlace.text = Questions[i];
+        //Go to Landing page
         Landing.SetActive(true);
+        //Fadeaway from landing to connect page
         StartCoroutine(Landing_Fade());
-        //Check IF a local save data is here
+        //Awake the DataServices
         D = GetComponent<DataServices>();
-        
+    }
+
+    //For now Awake is not used
+    private void Awake()
+    {
+        /*
+        Check if there is a local save data;
+        IF:if exists then show Connect Button
+        ELSE:Disable the Connect button from UI
+         */
 
     }
 
@@ -95,11 +118,29 @@ public class Menus : MonoBehaviour
     //Calls a ForgotPassword method from DataService
     public void ForgotPasswordButton()
     {
-        D.mail.email = EmailBox_Login.text.ToString();
-        D.ForgotPassword(D.mail);
+        if (EmailBox_Login.text.Length > 0)
+        {
+            if (((EmailBox_Login.text).ToString()).Contains("@") && ((EmailBox_Login.text).ToString()).Contains("."))
+            {
+                D.mail.email = EmailBox_Login.text.ToString();
+                D.ForgotPassword(D.mail);
+            }
+            else
+            {
+                //Error message pops-up as please enter a valid email
+                ErrorText.text = "Email area must be filled correctly!";
+                StartCoroutine(ErrorButton_Waiter());
+            }
+        }
+        else
+        {
+            //Error message pops-up as nothing entered on emailbox
+            ErrorText.text = "Email area must be filled!";
+            StartCoroutine(ErrorButton_Waiter());
+        }
     }
 
-    //UNCOMPLETED
+    //HALF COMPLETED // LATER TESTS AND IMPROVEMENTS WILL DONE SOON
     //Pre_Test Next button behaivour region from PreTest Panel
     public void Tests_Next_Button()
     {
@@ -161,6 +202,8 @@ public class Menus : MonoBehaviour
                     case 8:
                         D.pre.puan = buttonvalue;
                         D.SendTestData(D.pre);
+                        //Next button => Start Button
+                        NextButton.SetActive(false);
                         break;
                 }
                 //Increment the counter to get next question
@@ -182,16 +225,18 @@ public class Menus : MonoBehaviour
         Connect.SetActive(false);
         Signin.SetActive(true);
     }
-    
+
 
     //HALF COMPLETED ! NEED TO BE CHECKED
     //Connect button behaivour region from Connect Panel
     //Reads local Connection.json data and gets 2 variables
     //gets user_id and security, sends the data and auto-connects to server
     //then logs-in to app and continues on where the person left
+    //IMPORTANT NOTE: Platform based local save path may change due to some security issues
+    //IF THIS EVER HAPPENS read Application.dataPath and Script Serialization docs from Unity Docs
     public void Connect_Button()
     {
-        //Get local Data
+        //Get local Data for auto login
         string Local_User = D.GetLocalUserData();
         Button_Waiter();
         if (!(Local_User == "No"))
@@ -230,16 +275,14 @@ public class Menus : MonoBehaviour
 
     }
 
-    //HALF COMPLETED ! NEED TO BE CHECKED
+    //COMPLETED ! NEED TO BE CHECKED
     //Signin button behaivour region from Signin Panel
+    //NOTICE: CAN'T CHECK IF USER IS AVAILABLE OR NOT
+    //OR TRUE CONNECTION IS ESTABLISHED
+    //ADD A TRY CATCH TO THE SYSTEM
+    //OR A CHECKING SYSTEM
     public void Signin_Button()
     {
-        //If: We are on the login page => Go to Signin page
-        if (!Signin.activeSelf)
-        {
-            Signin.SetActive(true);
-            Login.SetActive(false);
-        }
         //If user inputs are fully given
         if (NameBox.text.Length > 0 && EmailBox.text.Length > 0 && PasswordBox.text.Length > 0)
         {
@@ -249,8 +292,10 @@ public class Menus : MonoBehaviour
                 D.user.name = NameBox.text.ToString();
                 D.user.email = EmailBox.text.ToString();
                 D.user.password = PasswordBox.text.ToString();
-                //send data to server
+                //send data to server for user register
                 D.BuildNewSerialization(D.user);
+                ErrorText.text = "Registered to the system";
+                StartCoroutine(ErrorButton_Waiter());
 
                 NameBox.text = "";
                 EmailBox.text = "";
@@ -274,19 +319,21 @@ public class Menus : MonoBehaviour
 
     }
 
-    //HALF COMPLETED ! LAST CHECKS WILL BE MADE SOON
+    //COMPLETED ! LAST CHECKS WILL BE MADE SOON
     //Login button behaivour region from Signin Panel
+    //NOTICE: CAN'T CHECK IF USER IS AVAILABLE OR NOT
+    //OR TRUE CONNECTION IS ESTABLISHED
+    //ADD A TRY CATCH TO THE SYSTEM
+    //OR A CHECKING SYSTEM
     public void Login_Button()
     {
-        //If: We are on the sign-in page => Go to Login page
         if (Signin.activeSelf)
         {
             Signin.SetActive(false);
             Login.SetActive(true);
         }
-        //Else: Continue on process
         else
-        {   
+        {
             //If user inputs are fully given
             if (EmailBox_Login.text.Length > 0 && PasswordBox_Login.text.Length > 0)
             {
@@ -297,22 +344,27 @@ public class Menus : MonoBehaviour
                     D.user.password = PasswordBox_Login.text.ToString();
                     //Do the login
                     D.LoginManuel(D.user);
-                    //MİLLETİANS AT WORK !!
+                    //NOTICE: CAN'T CHECK IF USER IS AVAILABLE OR NOT
+                    //OR TRUE CONNECTION IS ESTABLISHED
+                    //ADD A TRY CATCH TO THE SYSTEM
+                    //OR A CHECKING SYSTEM
+
+                    ErrorText.text = "Logged in to the system";
+                    StartCoroutine(ErrorButton_Waiter());
                     //At here the system will get user info to know which page must direct the client
-                    string X = D.GetLocalUserData();
-                    //string X = "";
-                    if (!(X == "No"))
+                    string redirect = D.GetLocalUserData();
+                    if (!(redirect == "No"))
                     {
                         Login.SetActive(false);
                         /*
                          If user not made pre-test before -> Go to PreTest
                          Else user made pre-test before -> Go to Game
                          */
-                        if (X.Contains("user_detay:1"))
+                        if (redirect.Contains("user_detay:1"))
                         {
                             //NOTICE: LATER IMPLEMENTATIONS WITH MODULS WILL ADDED LATER
                             //If User is on modul 0
-                            if (X.Contains("giris_test:1"))
+                            if (redirect.Contains("giris_test:1"))
                             {
                                 //Go to game scene
                                 SceneManager.LoadScene("Basketbol");
@@ -455,6 +507,15 @@ public class Menus : MonoBehaviour
                 break;
         }
     }
+
+    //Start button for scene change from UI to PlayArea
+    public void StartGame()
+    {
+        SceneManager.LoadScene("Basketbol");
+    }
+
+
+
 
     //NOT USED PART, SAVED FOR REFERENCE
     /*

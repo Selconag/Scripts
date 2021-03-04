@@ -25,10 +25,36 @@ public class DataServices : MonoBehaviour
     private string Tjson;
 
     private byte[] xbyte;
+
+    //Application data path
+    /*
+     NOTE: The paths of the various platforms can change due to ios security reasons
+    Unity Editor: <path to project folder>/Assets
+
+    Mac player: <path to player app bundle>/Contents
+
+    iOS player: <path to player app bundle>/<AppName.app>/Data (this folder is read only, use Application.persistentDataPath to save data).**
+
+    Win/Linux player: <path to executablename_Data folder> (note that most Linux installations will be case-sensitive!)
+
+    WebGL: The absolute url to the player data file folder (without the actual data file name)
+
+    Android: Normally it points directly to the APK. If you are running a split binary build, it points to the OBB instead.
+
+    Windows Store Apps: The absolute path to the player data folder (this folder is read only, use Application.persistentDataPath to save data)
+
+    Use Application.persistentDataPath for ios devices this can fix the problems as stated above too
+    */
+    [SerializeField] public static string Game_Path;
+    //On application's awakening, the application's path is getted
+    private void Awake()
+    {
+        Game_Path = Application.dataPath;
+    }
     //User class data stored path    
-    private string path = @"C:\Unity Projects\UI\Assets\Scripts\UserData.json";//Can change later
+    private string path = Game_Path + "/UserData.json";//Can change later
     //Connect class data stored path
-    private string Cpath = @"C:\Unity Projects\UI\Assets\Scripts\ConnectionData.json";//Can change later
+    private string Cpath = Game_Path + "/ConnectionData.json";//Can change later
 
     public User user = new User();
     public Connection con = new Connection();
@@ -115,7 +141,7 @@ public class DataServices : MonoBehaviour
     }
     
     //NON USED PROTOTYPE FOR FURTHER USAGE
-    //OTHER PROTOTYPES UPGRADED VERSION OF THIS CODE
+    //OTHER PROTOTYPES ARE UPGRADED VERSION OF THIS CODE BLOCK
     IEnumerator Upload()
     {
         WebRequest request = WebRequest.Create(Links.Register_URL);//Burası değişecek(localhost -> Esvolon)
@@ -159,10 +185,8 @@ public class DataServices : MonoBehaviour
         yield return 0;
     }
 
-    //Bunun bool değer döndürenini de oluştur ve auto-login için kullan
-    //Daha sonra URL'yi methodu çağırırken yolla ki modüler tasarım olsun
-
     //MODULAR TESTED DATA SENDER and GETTER
+    //Used for web connection and data sending/getting from server
     public void Modular_Data_Sender(string data,int state)
     {
         string URL;

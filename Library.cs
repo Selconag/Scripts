@@ -118,3 +118,16 @@ namespace Library
         public const string GetUser_URL = "https://esvolon.uniqdesignfactory.com/api/users/get-user";
     }
 }
+/*
+ FURTHER NOTICE FOR IOS, ANDROID AND WINDOWS BUILDS
+ 1)On Android File.Create(Application.persistentDataPath + "TheFile") statement is crucial for creating save datas
+ Application.persistentDataPath => leads to => LocalStorage/Android/data/com."GameName"/files
+ so as for (Application.persistentDataPath + "TheFile") statement a PLUS(+) is a must for not making save name something like
+ LocalStorage/Android/data/com."GameName"/filesTheFile which is wrong implementation
+ 2)On İos will be added after tests
+
+
+ 3)For others
+ 
+ */
+

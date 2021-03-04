@@ -49,12 +49,12 @@ public class DataServices : MonoBehaviour
     //On application's awakening, the application's path is getted
     private void Awake()
     {
-        Game_Path = Application.dataPath;
+        Game_Path = Application.persistentDataPath;
     }
     //User class data stored path    
     private string path = Game_Path + "/UserData.json";//Can change later
     //Connect class data stored path
-    private string Cpath = Game_Path + "/ConnectionData.json";//Can change later
+    private string Cpath = Game_Path + "/ConnectionData.dat";//Can change later
 
     public User user = new User();
     public Connection con = new Connection();
@@ -80,17 +80,32 @@ public class DataServices : MonoBehaviour
         Ujson = JsonUtility.ToJson(user1) ?? "";
         Modular_Data_Sender(Ujson, 0);
         BuildSerialization(con);
-        System.IO.File.WriteAllText(Cpath, Cjson);
+        if (File.Exists(Cpath))
+            System.IO.File.WriteAllText(Cpath, Cjson);
+        else
+        {
+            File.Create(Cpath);
+            System.IO.File.WriteAllText(Cpath, Cjson);
+        }
     }
     //Used For Manual Login
     public void LoginManuel(User user1)
     {
+        File.Create(Application.persistentDataPath + "TheFile");
+        File.WriteAllText(Cpath, "Ok");
         Ujson = JsonUtility.ToJson(user1) ?? "";
         Modular_Data_Sender(Ujson, 1);
         Cjson = JsonUtility.ToJson(con) ?? "";
         //Below may wrong implemented, will look detailed later
         //con = JsonUtility.FromJson<Connection>(Cjson);
+        if(File.Exists(Cpath))
         System.IO.File.WriteAllText(Cpath, Cjson);
+        else
+        {
+            File.Create(Cpath);
+            System.IO.File.WriteAllText(Cpath, Cjson);
+        }
+        
         //return Ujson;
     }
 
@@ -108,6 +123,7 @@ public class DataServices : MonoBehaviour
             Cjson = System.IO.File.ReadAllText(Cpath);
             con = JsonUtility.FromJson<Connection>(Cjson);
             //post data here and then get the user data from server
+            Modular_Data_Sender(Cjson,5);
             return Cjson;
         }
         else
@@ -209,7 +225,6 @@ public class DataServices : MonoBehaviour
             case 4:
                 URL = Links.PreTest_URL;
                 break;
-            //NOT YET IMPLEMENTED
             case 5:
                 URL = Links.GetUser_URL;
                 break;

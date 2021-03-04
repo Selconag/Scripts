@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Library;
 using System.IO;
+using UnityEngine.Android;
 public class Menus : MonoBehaviour
 {
     //Other Classes
@@ -87,6 +88,78 @@ public class Menus : MonoBehaviour
                 ConnectButton.SetActive(false);
             }
         }
+    }
+
+    //YEDEK IS USED FOR MULTIPLATFORM BUILDING CHANGES
+    private void yedek()
+    {
+
+        //IF APPLICATION IS RUNNING ON AN ANDROID DEVICE
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            /*
+            Ask for User File Read and Write permissions for Android
+            */
+            if (Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite) &&
+                Permission.HasUserAuthorizedPermission(Permission.ExternalStorageRead))
+            {
+                // The user authorized read and write abilities, so you can start game.
+
+                //Load first question to Questions Array for pretest
+                QuestionTextPlace.text = Questions[i];
+                //Go to Landing page
+                Landing.SetActive(true);
+                //Fadeaway from landing to connect page
+                StartCoroutine(Landing_Fade());
+                //Awake the DataServices
+                D = GetComponent<DataServices>();
+            }
+            else
+            {
+                // We do not have permission to use the microphone.
+                // Ask for permission or proceed without the functionality enabled.
+                Permission.RequestUserPermission(Permission.ExternalStorageWrite);
+                Permission.RequestUserPermission(Permission.ExternalStorageRead);
+                if (Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite) &&
+                Permission.HasUserAuthorizedPermission(Permission.ExternalStorageRead))
+                {
+                    //Load first question to Questions Array for pretest
+                    QuestionTextPlace.text = Questions[i];
+                    //Go to Landing page
+                    Landing.SetActive(true);
+                    //Fadeaway from landing to connect page
+                    StartCoroutine(Landing_Fade());
+                    //Awake the DataServices
+                    D = GetComponent<DataServices>();
+                }
+                else Application.Quit();
+            }
+        }
+        //IF APPLICATION IS RUNNING ON AN IOS DEVICE
+        else if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            //Load first question to Questions Array for pretest
+            QuestionTextPlace.text = Questions[i];
+            //Go to Landing page
+            Landing.SetActive(true);
+            //Fadeaway from landing to connect page
+            StartCoroutine(Landing_Fade());
+            //Awake the DataServices
+            D = GetComponent<DataServices>();
+        }
+        //IF APPLICATION IS RUNNING ON WHATEVER
+        else
+        {
+            //Load first question to Questions Array for pretest
+            QuestionTextPlace.text = Questions[i];
+            //Go to Landing page
+            Landing.SetActive(true);
+            //Fadeaway from landing to connect page
+            StartCoroutine(Landing_Fade());
+            //Awake the DataServices
+            D = GetComponent<DataServices>();
+        }
+
     }
 
     void Start()
@@ -333,7 +406,7 @@ public class Menus : MonoBehaviour
             Login.SetActive(true);
         }
         else
-        {
+        {      
             //If user inputs are fully given
             if (EmailBox_Login.text.Length > 0 && PasswordBox_Login.text.Length > 0)
             {

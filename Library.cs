@@ -92,6 +92,10 @@ namespace Library
         [SerializeField] public string sekiz;
         //Rating question, answer will be taken as int
         [SerializeField] public int puan = 0;
+        //Security number for security clearance
+        [SerializeField] public string security;
+        //User id which created on the sign-up / Unique
+        [SerializeField] public string user_id;
     }
     [System.Serializable]
     public class LastTest
@@ -117,6 +121,14 @@ namespace Library
         public const string PreTest_URL = "http://esvolon.uniqdesignfactory.com/api/users/giris-test";
         public const string GetUser_URL = "https://esvolon.uniqdesignfactory.com/api/users/get-user";
     }
+
+    [System.Serializable]
+    public class Response
+    {
+        //For boolean state checks
+        [SerializeField] public int response;
+    }
+
 }
 /*
  FURTHER NOTICE FOR IOS, ANDROID AND WINDOWS BUILDS

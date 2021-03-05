@@ -1,11 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Library;
 using System.IO;
 using UnityEngine.Android;
+// using System.Text.RegularExpressions
+//Used for comparison of texts like Regex.IsMatch(Age.text, @"^\d+$"))=>
+//=> Compares a textbox, if all chars are integer returns true, else returns false
+using System.Text.RegularExpressions;
 public class Menus : MonoBehaviour
 {
     //Other Classes
@@ -76,7 +81,7 @@ public class Menus : MonoBehaviour
         //If:Connect Button appears
         if (Connect.activeSelf) 
         {
-            if (File.Exists(DataServices.Game_Path + "/ConnectionData.json"))
+            if (File.Exists(Application.persistentDataPath + "/Connection.json"))
             {
                 //If a save data comes later or available at start
                 ConnectButton.SetActive(true);
@@ -164,6 +169,7 @@ public class Menus : MonoBehaviour
 
     void Start()
     {
+        PreTest.SetActive(false);
         //Load first question to Questions Array for pretest
         QuestionTextPlace.text = Questions[i];
         //Go to Landing page
@@ -226,17 +232,24 @@ public class Menus : MonoBehaviour
         //Sends User Details on first "next" button click
         else if (User_Detail_Panel.activeSelf)//NEXT Butonuna tıklanınca
         {
-            //Cevapları al ve gönder
-            D.user.age = Age.text.ToString();
-            D.user.country = Gender.text.ToString();
-            D.user.occupation = Occupation.text.ToString();
-            D.user.prof_exp = ProfExp.text.ToString();
-            D.user.security = D.con.security;
-            D.user.user_id = D.con.user_id;
-            D.BuildNewSerialization(D.user);
-            User_Detail_Panel.SetActive(false);
-            TestGroup.SetActive(true);
-            QuestionTextPlace.text = Questions[i];
+            if (Gender.text.Length > 0 && Occupation.text.Length > 0 && Age.text.Length > 0 && ProfExp.text.Length > 0)
+            {
+                //Regex compares the textbox, if all chars are integer then returns true, forr others we check if string is not empty
+                if ((Regex.IsMatch(Age.text, @"^\d+$")) && (Occupation.text.ToString() == "") && (Gender.text.ToString() == "") && (Regex.IsMatch(ProfExp.text, @"^\d+$")))
+                {
+                    //Cevapları al ve gönder
+                    D.user.age = Age.text.ToString();
+                    D.user.country = Gender.text.ToString();
+                    D.user.occupation = Occupation.text.ToString();
+                    D.user.prof_exp = ProfExp.text.ToString();
+                    D.user.security = D.con.security;
+                    D.user.user_id = D.con.user_id;
+                    D.BuildNewSerialization(D.user);
+                    User_Detail_Panel.SetActive(false);
+                    TestGroup.SetActive(true);
+                    QuestionTextPlace.text = Questions[i];
+                }
+            }
         }
         else
         {
@@ -319,9 +332,9 @@ public class Menus : MonoBehaviour
              If user not made pre-test before -> Go to PreTest
              Else user made pre-test before -> Go to Game
              */
-            if (Local_User.Contains("user_detay:1"))
+            if ((D.con.user_detay == 1))
             {
-                if (Local_User.Contains("giris_test:1"))
+                if (D.con.giris_test == 1)
                 {
                     //Go to game scene
                     SceneManager.LoadScene("Basketbol");
@@ -330,14 +343,20 @@ public class Menus : MonoBehaviour
                 {
                     //Go to pretest
                     PreTest.SetActive(true);
+                    Start_Test_Panel.SetActive(false);
+                    NextButton.SetActive(true);
+                    User_Detail_Panel.SetActive(false);
                     TestGroup.SetActive(true);
-                }
+                }   
             }
             else
             {
                 //Go to user_detail panel
                 PreTest.SetActive(true);
                 Start_Test_Panel.SetActive(true);
+                NextButton.SetActive(false);
+                User_Detail_Panel.SetActive(false);
+                TestGroup.SetActive(false);
             }
         }
         else
@@ -416,28 +435,29 @@ public class Menus : MonoBehaviour
                     D.user.email = EmailBox_Login.text.ToString();
                     D.user.password = PasswordBox_Login.text.ToString();
                     //Do the login
-                    D.LoginManuel(D.user);
-                    //NOTICE: CAN'T CHECK IF USER IS AVAILABLE OR NOT
-                    //OR TRUE CONNECTION IS ESTABLISHED
-                    //ADD A TRY CATCH TO THE SYSTEM
-                    //OR A CHECKING SYSTEM
-
-                    ErrorText.text = "Logged in to the system";
-                    StartCoroutine(ErrorButton_Waiter());
-                    //At here the system will get user info to know which page must direct the client
-                    string redirect = D.GetLocalUserData();
-                    if (!(redirect == "No"))
+                    int situation = D.LoginManuel(D.user);
+                    
+                    if(situation == 1)
                     {
-                        Login.SetActive(false);
+                        ErrorText.text = "Logged in to the system";
+                        StartCoroutine(ErrorButton_Waiter());
+
+                        //At here the system will get user info to know which page must direct the client
+                        //string redirect = D.GetLocalUserData();
+                        //if (!(redirect == "No"))
+
+                        //Upward system is not used for now, a new system is testing
+
+                            Login.SetActive(false);
                         /*
                          If user not made pre-test before -> Go to PreTest
                          Else user made pre-test before -> Go to Game
                          */
-                        if (redirect.Contains("user_detay:1"))
+                        if (D.con.user_detay == 1)
                         {
                             //NOTICE: LATER IMPLEMENTATIONS WITH MODULS WILL ADDED LATER
                             //If User is on modul 0
-                            if (redirect.Contains("giris_test:1"))
+                            if (D.con.giris_test == 1)
                             {
                                 //Go to game scene
                                 SceneManager.LoadScene("Basketbol");
@@ -446,20 +466,27 @@ public class Menus : MonoBehaviour
                             {
                                 //Go to pretest
                                 PreTest.SetActive(true);
-                                TestGroup.SetActive(true);
+                                Start_Test_Panel.SetActive(false);
+                                NextButton.SetActive(true);
+                                User_Detail_Panel.SetActive(false);
+                                TestGroup.SetActive(false);
                             }
                         }
+                        //Else if for //BURADA KALDIK EN SON İŞİM RESPONSE İLE SİSTEM KONTROLÜ YAPMAKTI !!! EKLEME YAPMAYI UNUTMA
+                        // public string Modular_Data_Sender(string data,int state) BURAYA BAK
                         else
                         {
                             //Go to user_detail panel
                             PreTest.SetActive(true);
                             Start_Test_Panel.SetActive(true);
+                            NextButton.SetActive(false);
+                            User_Detail_Panel.SetActive(false);
+                            TestGroup.SetActive(false);
                         }
                     }
                     else
                     {
-                        //There is no Local save please first log in
-                        StartCoroutine(ErrorButton_Waiter());
+
                     }
                 }
                 else

@@ -24,6 +24,11 @@ public class DataServices : MonoBehaviour
     //PreTest class data taker
     private string Tjson;
 
+    //User class data stored path    
+    private string path = Game_Path + "/UserData.json";//Can change later
+    //Connect class data stored path
+    string Cpath;//Can change later
+
     private byte[] xbyte;
 
     //Application data path
@@ -47,19 +52,20 @@ public class DataServices : MonoBehaviour
     */
     [SerializeField] public static string Game_Path;
     //On application's awakening, the application's path is getted
-    private void Awake()
+    public void Start()
     {
         Game_Path = Application.persistentDataPath;
+        Cpath = Game_Path + "/Connection.json";
     }
-    //User class data stored path    
-    private string path = Game_Path + "/UserData.json";//Can change later
-    //Connect class data stored path
-    private string Cpath = Game_Path + "/ConnectionData.dat";//Can change later
+
+    
+
 
     public User user = new User();
     public Connection con = new Connection();
     public PreTest pre = new PreTest();
     public Email mail = new Email();
+    public Response res = new Response();
 
     //API Connection url addresses are in the Library.cs
 
@@ -71,14 +77,10 @@ public class DataServices : MonoBehaviour
         Modular_Data_Sender(JsonUtility.ToJson(email) ?? "", 2);
     }
 
-    void Start()
-    {
-       
-    }
     public void BuildNewSerialization(User user1)
     {
         Ujson = JsonUtility.ToJson(user1) ?? "";
-        Modular_Data_Sender(Ujson, 0);
+        Modular_Data_Sender(Ujson, 3);
         BuildSerialization(con);
         if (File.Exists(Cpath))
             System.IO.File.WriteAllText(Cpath, Cjson);
@@ -89,12 +91,11 @@ public class DataServices : MonoBehaviour
         }
     }
     //Used For Manual Login
-    public void LoginManuel(User user1)
+    public int LoginManuel(User user1)
     {
-        File.Create(Application.persistentDataPath + "TheFile");
-        File.WriteAllText(Cpath, "Ok");
+        int returner;
         Ujson = JsonUtility.ToJson(user1) ?? "";
-        Modular_Data_Sender(Ujson, 1);
+        returner = Int32.Parse(Modular_Data_Sender(Ujson, 1));
         Cjson = JsonUtility.ToJson(con) ?? "";
         //Below may wrong implemented, will look detailed later
         //con = JsonUtility.FromJson<Connection>(Cjson);
@@ -106,7 +107,7 @@ public class DataServices : MonoBehaviour
             System.IO.File.WriteAllText(Cpath, Cjson);
         }
         
-        //return Ujson;
+        return returner;
     }
 
     //COMPLETED!!
@@ -138,10 +139,11 @@ public class DataServices : MonoBehaviour
     //Used Only for Sending Pre-Test Questions Data
     public void SendTestData(PreTest test)
     {
-        Cjson = System.IO.File.ReadAllText(Cpath);
+        test.user_id = con.user_id;
+        test.security = con.security;
         Tjson = JsonUtility.ToJson(test) ?? "";
         //Send Pre-test Data
-        Modular_Data_Sender(Cjson+Tjson,4);
+        Modular_Data_Sender(Tjson,4);
 
     }
     //User Serializer
@@ -203,7 +205,7 @@ public class DataServices : MonoBehaviour
 
     //MODULAR TESTED DATA SENDER and GETTER
     //Used for web connection and data sending/getting from server
-    public void Modular_Data_Sender(string data,int state)
+    public string Modular_Data_Sender(string data,int state)
     {
         string URL;
         switch (state)
@@ -214,11 +216,9 @@ public class DataServices : MonoBehaviour
             case 1:
                 URL = Links.Login_URL;
                 break;
-            //STILL ON TEST
             case 2:
                 URL = Links.ForgotPassword_URL;
                 break;
-            //NOT YET IMPLEMENTED
             case 3:
                 URL = Links.UserDetail_URL;
                 break;
@@ -248,10 +248,13 @@ public class DataServices : MonoBehaviour
         {
             StreamReader reader = new StreamReader(dataStream);
             string responseFromServer = reader.ReadToEnd();
+            //Take the situation response from server
+            JsonUtility.FromJsonOverwrite(responseFromServer, res);
+            //Get the connection info from server if needed
             JsonUtility.FromJsonOverwrite(responseFromServer, con);
             Console.WriteLine(responseFromServer);
         }
         response.Close();
-
+        return res.response.ToString();
     }
 }

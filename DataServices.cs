@@ -31,6 +31,9 @@ public class DataServices : MonoBehaviour
 
     private byte[] xbyte;
 
+    //Returns the responses from methods
+    int returner;
+
     //Application data path
     /*
      NOTE: The paths of the various platforms can change due to ios security reasons
@@ -77,10 +80,11 @@ public class DataServices : MonoBehaviour
         Modular_Data_Sender(JsonUtility.ToJson(email) ?? "", 2);
     }
 
-    public void BuildNewSerialization(User user1)
+    public int BuildNewSerialization(User user1)
     {
+        
         Ujson = JsonUtility.ToJson(user1) ?? "";
-        Modular_Data_Sender(Ujson, 3);
+        returner = Int32.Parse(Modular_Data_Sender(Ujson, 3));
         BuildSerialization(con);
         if (File.Exists(Cpath))
             System.IO.File.WriteAllText(Cpath, Cjson);
@@ -89,11 +93,12 @@ public class DataServices : MonoBehaviour
             File.Create(Cpath);
             System.IO.File.WriteAllText(Cpath, Cjson);
         }
+        return returner;
     }
     //Used For Manual Login
     public int LoginManuel(User user1)
     {
-        int returner;
+        
         Ujson = JsonUtility.ToJson(user1) ?? "";
         returner = Int32.Parse(Modular_Data_Sender(Ujson, 1));
         Cjson = JsonUtility.ToJson(con) ?? "";
@@ -115,7 +120,7 @@ public class DataServices : MonoBehaviour
     //if data exists return data as string
     //else return "No" as string
     //connectıon data is used for AUTO-LOGIN process
-    public string GetLocalUserData()
+    public int GetLocalUserData()
     {
         //check if file is available
         //then post security and u_id to server
@@ -124,14 +129,14 @@ public class DataServices : MonoBehaviour
             Cjson = System.IO.File.ReadAllText(Cpath);
             con = JsonUtility.FromJson<Connection>(Cjson);
             //post data here and then get the user data from server
-            Modular_Data_Sender(Cjson,5);
-            return Cjson;
+            returner=Int32.Parse(Modular_Data_Sender(Cjson,5));
+            return returner;
         }
         else
         {
             Cjson = System.IO.File.ReadAllText(Cpath);
             Debug.Log("No files exist! Please Log-in first");
-            return "No";
+            return 0;
         }
 
     }

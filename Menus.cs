@@ -323,9 +323,9 @@ public class Menus : MonoBehaviour
     public void Connect_Button()
     {
         //Get local Data for auto login
-        string Local_User = D.GetLocalUserData();
+        int situation = D.GetLocalUserData();
         Button_Waiter();
-        if (!(Local_User == "No"))
+        if (situation == 1)
         {
             Connect.SetActive(false);
             /*
@@ -362,6 +362,7 @@ public class Menus : MonoBehaviour
         else
         {
             //There is no Local save please first log in
+            ErrorText.text = "There is no local save data present. Please login first!";
             StartCoroutine(ErrorButton_Waiter());
         }
 
@@ -385,8 +386,10 @@ public class Menus : MonoBehaviour
                 D.user.email = EmailBox.text.ToString();
                 D.user.password = PasswordBox.text.ToString();
                 //send data to server for user register
-                D.BuildNewSerialization(D.user);
-                ErrorText.text = "Registered to the system";
+                int situation = D.BuildNewSerialization(D.user);
+                if(situation == 1) ErrorText.text = "Registered to the system successfully";
+                else if (situation == 2) ErrorText.text = "You are already registered to the system";
+                else ErrorText.text = "An Error Occured";
                 StartCoroutine(ErrorButton_Waiter());
 
                 NameBox.text = "";
@@ -437,6 +440,7 @@ public class Menus : MonoBehaviour
                     //Do the login
                     int situation = D.LoginManuel(D.user);
                     
+                    //If response from server is returned as OK! then go on
                     if(situation == 1)
                     {
                         ErrorText.text = "Logged in to the system";
@@ -484,9 +488,11 @@ public class Menus : MonoBehaviour
                             TestGroup.SetActive(false);
                         }
                     }
+                    //If response is came as 0, then bring up an error message
                     else
                     {
-
+                        ErrorText.text = "Could not logged in to the system!";
+                        StartCoroutine(ErrorButton_Waiter());
                     }
                 }
                 else
@@ -613,9 +619,6 @@ public class Menus : MonoBehaviour
     {
         SceneManager.LoadScene("Basketbol");
     }
-
-
-
 
     //NOT USED PART, SAVED FOR REFERENCE
     /*

@@ -239,7 +239,7 @@ public class Menus : MonoBehaviour
             if (Gender.text.Length > 0 && Occupation.text.Length > 0 && Age.text.Length > 0 && ProfExp.text.Length > 0)
             {
                 //Regex compares the textbox, if all chars are integer then returns true, forr others we check if string is not empty
-                if ((Regex.IsMatch(Age.text, @"^\d+$")) && (Occupation.text.ToString() == "") && (Gender.text.ToString() == "") && (Regex.IsMatch(ProfExp.text, @"^\d+$")))
+                if ((Regex.IsMatch(Age.text, @"^\d+$")) && (Occupation.text.ToString() != "") && (Gender.text.ToString() != "") && (Regex.IsMatch(ProfExp.text, @"^\d+$")))
                 {
                     //Cevapları al ve gönder
                     D.user.age = Age.text.ToString();
@@ -248,11 +248,22 @@ public class Menus : MonoBehaviour
                     D.user.prof_exp = ProfExp.text.ToString();
                     D.user.security = D.con.security;
                     D.user.user_id = D.con.user_id;
-                    D.BuildNewSerialization(D.user);
-                    //CHECK if sended dat ais correct and we got a response
-                    User_Detail_Panel.SetActive(false);
-                    TestGroup.SetActive(true);
-                    QuestionTextPlace.text = Questions[i];
+                    int resp = D.BuildNewSerialization(D.user);
+                    if(resp == 1)
+                    {
+                        //Successfully sended data
+                        User_Detail_Panel.SetActive(false);
+                        TestGroup.SetActive(true);
+                        QuestionTextPlace.text = Questions[i];
+                    }
+                    else
+                    {
+                        //Couldn't send the data
+                        //Maybe wrong type data or server connection problems?
+
+                        //Nothing happens
+                    }
+
                 }
             }
         }
@@ -294,6 +305,21 @@ public class Menus : MonoBehaviour
                         D.pre.puan = buttonvalue;
                         D.SendTestData(D.pre);
                         //Next button => Start Button
+                        int resp = D.SendTestData(D.pre);
+                        if (resp == 1)
+                        {
+                            //Successfully sended data
+                            User_Detail_Panel.SetActive(false);
+                            TestGroup.SetActive(true);
+                            QuestionTextPlace.text = Questions[i];
+                        }
+                        else
+                        {
+                            //Couldn't send the data
+                            //Maybe wrong type data or server connection problems?
+
+                            //Nothing happens
+                        }
                         NextButton.SetActive(false);
                         break;
                 }

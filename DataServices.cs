@@ -154,14 +154,14 @@ public class DataServices : MonoBehaviour
     }
     
     //Used Only for Sending Pre-Test Questions Data
-    public void SendTestData(PreTest test)
+    public int SendTestData(PreTest test)
     {
         test.user_id = con.user_id;
         test.security = con.security;
         Tjson = JsonUtility.ToJson(test) ?? "";
         //Send Pre-test Data
-        Modular_Data_Sender(Tjson,4);
-
+        returner = Int32.Parse(Modular_Data_Sender(Tjson, 4));
+        return returner;
     }
     
     //NON USED PROTOTYPE FOR FURTHER USAGE

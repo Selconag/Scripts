@@ -239,7 +239,7 @@ public class Menus : MonoBehaviour
             if (Gender.text.Length > 0 && Occupation.text.Length > 0 && Age.text.Length > 0 && ProfExp.text.Length > 0)
             {
                 //Regex compares the textbox, if all chars are integer then returns true, forr others we check if string is not empty
-                if ((Regex.IsMatch(Age.text, @"^\d+$")) && (Occupation.text.ToString() != "") && (Gender.text.ToString() != "") && (Regex.IsMatch(ProfExp.text, @"^\d+$")))
+                if ((Regex.IsMatch(Age.text, @"^\d+$"))  && (Regex.IsMatch(ProfExp.text, @"^\d+$")))
                 {
                     //Cevapları al ve gönder
                     D.user.age = Age.text.ToString();
@@ -260,8 +260,8 @@ public class Menus : MonoBehaviour
                     {
                         //Couldn't send the data
                         //Maybe wrong type data or server connection problems?
-
-                        //Nothing happens
+                        ErrorText.text = "An Error Occured!";
+                        StartCoroutine(ErrorButton_Waiter());
                     }
 
                 }
@@ -305,6 +305,7 @@ public class Menus : MonoBehaviour
                         D.pre.puan = buttonvalue;
                         D.SendTestData(D.pre);
                         //Next button => Start Button
+                        //NEARLY FINISHED HERE !!!
                         int resp = D.SendTestData(D.pre);
                         if (resp == 1)
                         {
@@ -317,8 +318,8 @@ public class Menus : MonoBehaviour
                         {
                             //Couldn't send the data
                             //Maybe wrong type data or server connection problems?
-
-                            //Nothing happens
+                            ErrorText.text = "An Error Occured!";
+                            StartCoroutine(ErrorButton_Waiter());
                         }
                         NextButton.SetActive(false);
                         break;
@@ -330,7 +331,7 @@ public class Menus : MonoBehaviour
             buttonstate = null;
             buttonvalue = 0;
         }
-
+        //TEST HERE!!
     }
 
 
@@ -574,7 +575,6 @@ public class Menus : MonoBehaviour
         Landing.SetActive(false);
         Connect.SetActive(true);
         Debug.Log("Connected");
-
         yield return 0;
     }
     //COMPLETED!!

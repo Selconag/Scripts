@@ -61,8 +61,6 @@ public class DataServices : MonoBehaviour
         Cpath = Game_Path + "/Connection.json";
     }
 
-    
-
 
     public User user = new User();
     public Connection con = new Connection();
@@ -80,12 +78,26 @@ public class DataServices : MonoBehaviour
         Modular_Data_Sender(JsonUtility.ToJson(email) ?? "", 2);
     }
 
+    //User Serializer
+    public void BuildSerialization(User user1)
+    {
+        user1 = JsonUtility.FromJson<User>(Ujson);
+    }
+    //Connection Serializer
+    public void BuildSerialization(Connection conn1)
+    {
+        conn1 = JsonUtility.FromJson<Connection>(Cjson);
+        ///return conn1;
+    }
+
+    //Serializer method for multipurpose
     public int BuildNewSerialization(User user1)
     {
         
         Ujson = JsonUtility.ToJson(user1) ?? "";
         returner = Int32.Parse(Modular_Data_Sender(Ujson, 3));
-        BuildSerialization(con);
+        //Non used part for now
+        //BuildSerialization(con);
         if (File.Exists(Cpath))
             System.IO.File.WriteAllText(Cpath, Cjson);
         else
@@ -150,17 +162,6 @@ public class DataServices : MonoBehaviour
         //Send Pre-test Data
         Modular_Data_Sender(Tjson,4);
 
-    }
-    //User Serializer
-    public void BuildSerialization(User user1)
-    {
-        user1 = JsonUtility.FromJson<User>(Ujson);
-    }
-    //Connection Serializer
-    public void BuildSerialization(Connection conn1)
-    {
-        conn1 = JsonUtility.FromJson<Connection>(Cjson);
-        ///return conn1;
     }
     
     //NON USED PROTOTYPE FOR FURTHER USAGE

@@ -221,6 +221,10 @@ public class Menus : MonoBehaviour
 
     //HALF COMPLETED // LATER TESTS AND IMPROVEMENTS WILL DONE SOON
     //Pre_Test Next button behaivour region from PreTest Panel
+    //When last question is answered make Play button appear instead of next button
+
+    //As the response checker the system will send the test data sand tries to get a response
+    //if the response is corect then 
     public void Tests_Next_Button()
     {
         if (Start_Test_Panel.activeSelf)//NEXT Butonuna tıklanınca
@@ -245,6 +249,7 @@ public class Menus : MonoBehaviour
                     D.user.security = D.con.security;
                     D.user.user_id = D.con.user_id;
                     D.BuildNewSerialization(D.user);
+                    //CHECK if sended dat ais correct and we got a response
                     User_Detail_Panel.SetActive(false);
                     TestGroup.SetActive(true);
                     QuestionTextPlace.text = Questions[i];
@@ -365,6 +370,7 @@ public class Menus : MonoBehaviour
             ErrorText.text = "There is no local save data present. Please login first!";
             StartCoroutine(ErrorButton_Waiter());
         }
+        situation = 0;
 
     }
 
@@ -403,6 +409,7 @@ public class Menus : MonoBehaviour
                 ErrorText.text = "Email area must be filled correctly!";
                 StartCoroutine(ErrorButton_Waiter());
             }
+
         }
         else
         {

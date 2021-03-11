@@ -84,20 +84,32 @@ public class DataServices : MonoBehaviour
         user1 = JsonUtility.FromJson<User>(Ujson);
     }
     //Connection Serializer
+    //CONTINUE ON LATER
     public void BuildSerialization(Connection conn1)
     {
+        Cjson = File.ReadAllText(Cpath);
         conn1 = JsonUtility.FromJson<Connection>(Cjson);
         ///return conn1;
     }
 
     //Serializer method for multipurpose
-    public int BuildNewSerialization(User user1)
+    //For sign-in call with 1
+    //For user detail call with 2
+    public int BuildNewSerialization(User user1,int operation)
     {
-        
-        Ujson = JsonUtility.ToJson(user1) ?? "";
-        returner = Int32.Parse(Modular_Data_Sender(Ujson, 3));
-        //Non used part for now
-        //BuildSerialization(con);
+        switch (operation)
+        {
+            case 1:
+                Ujson = JsonUtility.ToJson(user1) ?? "";
+                //Send register data to modular data sender
+                returner = Int32.Parse(Modular_Data_Sender(Ujson, 0));
+                break;
+            case 2:
+                Ujson = JsonUtility.ToJson(user1) ?? "";
+                //Send user detail data to modular data sender
+                returner = Int32.Parse(Modular_Data_Sender(Ujson, 3));
+                break;
+        }
         if (File.Exists(Cpath))
             System.IO.File.WriteAllText(Cpath, Cjson);
         else
@@ -123,7 +135,6 @@ public class DataServices : MonoBehaviour
             File.Create(Cpath);
             System.IO.File.WriteAllText(Cpath, Cjson);
         }
-        
         return returner;
     }
 
@@ -216,21 +227,28 @@ public class DataServices : MonoBehaviour
         string URL;
         switch (state)
         {
+            //Register operation
             case 0:
+                //!!!!
                 URL = Links.Register_URL;
                 break;
+            //Login operation
             case 1:
                 URL = Links.Login_URL;
                 break;
+            //Forgot password send operation
             case 2:
                 URL = Links.ForgotPassword_URL;
                 break;
+            //User Detail send operation
             case 3:
                 URL = Links.UserDetail_URL;
                 break;
+            //PreTest send operation
             case 4:
                 URL = Links.PreTest_URL;
                 break;
+            //Get User operation
             case 5:
                 URL = Links.GetUser_URL;
                 break;

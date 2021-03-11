@@ -36,6 +36,7 @@ public class Menus : MonoBehaviour
     public GameObject NumberButtonHolder;//For Rating Buttons
     public GameObject NextButton;
     public GameObject ConnectButton;
+    public GameObject StartGameButton;//Play Button after pre test
     //Buttons
     public Button yesButton;
     public Button noButton;
@@ -54,6 +55,7 @@ public class Menus : MonoBehaviour
     public InputField Gender;
     public InputField Occupation;
     public InputField ProfExp;
+    public InputField Country;
     //Error Panel
     public GameObject ErrorPanel;
     public Text ErrorText;
@@ -178,6 +180,7 @@ public class Menus : MonoBehaviour
         StartCoroutine(Landing_Fade());
         //Awake the DataServices
         D = GetComponent<DataServices>();
+        //D.BuildSerialization(D.con);
     }
 
     //For now Awake is not used
@@ -236,19 +239,22 @@ public class Menus : MonoBehaviour
         //Sends User Details on first "next" button click
         else if (User_Detail_Panel.activeSelf)//NEXT Butonuna tıklanınca
         {
-            if (Gender.text.Length > 0 && Occupation.text.Length > 0 && Age.text.Length > 0 && ProfExp.text.Length > 0)
+            if (Gender.text.Length > 0 && Occupation.text.Length > 0 && Age.text.Length > 0 && ProfExp.text.Length > 0 && Country.text.Length > 0)
             {
                 //Regex compares the textbox, if all chars are integer then returns true, forr others we check if string is not empty
                 if ((Regex.IsMatch(Age.text, @"^\d+$"))  && (Regex.IsMatch(ProfExp.text, @"^\d+$")))
                 {
                     //Cevapları al ve gönder
                     D.user.age = Age.text.ToString();
-                    D.user.country = Gender.text.ToString();
+                    D.user.gender = Gender.text.ToString();
                     D.user.occupation = Occupation.text.ToString();
                     D.user.prof_exp = ProfExp.text.ToString();
+                    D.user.country = Country.text.ToString();
                     D.user.security = D.con.security;
                     D.user.user_id = D.con.user_id;
-                    int resp = D.BuildNewSerialization(D.user);
+                    //YAĞIZA DANIŞ BU KISMI
+                    //EĞER VERİ DÜZGÜN BİR ŞEKİLDE GÖNDERİLEBİLİYORSA SİSTEM TAMAMDIR
+                    int resp = D.BuildNewSerialization(D.user,2);
                     if(resp == 1)
                     {
                         //Successfully sended data
@@ -303,9 +309,9 @@ public class Menus : MonoBehaviour
                         break;
                     case 8:
                         D.pre.puan = buttonvalue;
-                        D.SendTestData(D.pre);
                         //Next button => Start Button
-                        //NEARLY FINISHED HERE !!!
+                        //YAĞIZA DANIŞ BU KISMI
+                        //EĞER VERİ DÜZGÜN BİR ŞEKİLDE GÖNDERİLEBİLİYORSA SİSTEM TAMAMDIR
                         int resp = D.SendTestData(D.pre);
                         if (resp == 1)
                         {
@@ -322,10 +328,13 @@ public class Menus : MonoBehaviour
                             StartCoroutine(ErrorButton_Waiter());
                         }
                         NextButton.SetActive(false);
+                        //Activate the Start game Button
+                        StartGameButton.SetActive(true);
                         break;
                 }
                 //Increment the counter to get next question
                 i++;
+                if(i<9)
                 QuestionTextPlace.text = Questions[i];
             }
             buttonstate = null;
@@ -345,7 +354,7 @@ public class Menus : MonoBehaviour
     }
 
 
-    //HALF COMPLETED ! NEED TO BE CHECKED
+    //COMPLETED !!
     //Connect button behaivour region from Connect Panel
     //Reads local Connection.json data and gets 2 variables
     //gets user_id and security, sends the data and auto-connects to server
@@ -401,7 +410,7 @@ public class Menus : MonoBehaviour
 
     }
 
-    //COMPLETED ! NEED TO BE CHECKED
+    //COMPLETED !!
     //Signin button behaivour region from Signin Panel
     //NOTICE: CAN'T CHECK IF USER IS AVAILABLE OR NOT
     //OR TRUE CONNECTION IS ESTABLISHED
@@ -419,7 +428,7 @@ public class Menus : MonoBehaviour
                 D.user.email = EmailBox.text.ToString();
                 D.user.password = PasswordBox.text.ToString();
                 //send data to server for user register
-                int situation = D.BuildNewSerialization(D.user);
+                int situation = D.BuildNewSerialization(D.user,1);
                 if(situation == 1) ErrorText.text = "Registered to the system successfully";
                 else if (situation == 2) ErrorText.text = "You are already registered to the system";
                 else ErrorText.text = "An Error Occured";
@@ -448,7 +457,7 @@ public class Menus : MonoBehaviour
 
     }
 
-    //COMPLETED ! LAST CHECKS WILL BE MADE SOON
+    //COMPLETED !!
     //Login button behaivour region from Signin Panel
     //NOTICE: CAN'T CHECK IF USER IS AVAILABLE OR NOT
     //OR TRUE CONNECTION IS ESTABLISHED
@@ -507,7 +516,7 @@ public class Menus : MonoBehaviour
                                 Start_Test_Panel.SetActive(false);
                                 NextButton.SetActive(true);
                                 User_Detail_Panel.SetActive(false);
-                                TestGroup.SetActive(false);
+                                TestGroup.SetActive(true);
                             }
                         }
                         //Else if for //BURADA KALDIK EN SON İŞİM RESPONSE İLE SİSTEM KONTROLÜ YAPMAKTI !!! EKLEME YAPMAYI UNUTMA

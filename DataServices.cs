@@ -1,7 +1,7 @@
 ﻿
 //NOTES:Sender mesage for UnityWebRequest. An old implementation. Do not use UnityWebRequest class and methods. Instead of Unity's WebRequest please use
 //.NET Core Web Request class and its methods
-
+//14.03.2021
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

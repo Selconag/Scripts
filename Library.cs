@@ -31,6 +31,8 @@ namespace Library
         [SerializeField] public string user_id;
         //Is user finished Pre-Test?
         [SerializeField] public int modul = 0;
+        //Check if character is selected
+        [SerializeField] public int karakter = 0;
     }
     //Auto connection and many other details
     //pre tested for security leaks
@@ -57,25 +59,32 @@ namespace Library
     [System.Serializable]
     public class Game
     {
-
-
         //Check how many game tokens player has
         //Gametokens are used in mini games like ammunition in a weapon
         //As in basketball every token equals to a free throw
         [SerializeField] public int tokens = 0;
-
-
         //Total score is calculated as a game win condition
         /*
          * If the player reaches enough score, next game will be unlocked
-        Basketball: 20 points => Shot Put
-        Shot Put: 40 points => Javelin Throw
-        Javelin Throw: 60 points => Archery
-        Archery: 80 points => Long Jump
-        Long Jump: 100 points => Final Test
+        Basketball: 20 points => Archery
+        Archery: 30 points => Shot Put
+        Shot Put: 30 points => Javelin Throw
+        Javelin Throw: 40 points => Long jump
+        Long Jump: 30 points => Final Test
          */
         //After final test is done the client gets his/hers reward for completing the course
         [SerializeField] public int total_score = 0;
+        //Current Basket Score
+        [SerializeField] public int Basket_Score = 0;
+        //Current Shotput Score
+        [SerializeField] public int Shotput_Score = 0;
+        //Current Archery Score
+        [SerializeField] public int Archery_Score = 0;
+        //Current Long Jump Score
+        [SerializeField] public int LongJump_Score = 0;
+        //Current Javelin throw Score
+        [SerializeField] public int Javelin_Score = 0;
+
     }
 
     [System.Serializable]
@@ -120,6 +129,8 @@ namespace Library
         public const string UserDetail_URL = "http://esvolon.uniqdesignfactory.com/api/users/user-detail";
         public const string PreTest_URL = "http://esvolon.uniqdesignfactory.com/api/users/giris-test";
         public const string GetUser_URL = "https://esvolon.uniqdesignfactory.com/api/users/get-user";
+        public const string CharSelect_URL = "http://esvolon.uniqdesignfactory.com/api/users/set-karakter";
+        public const string SetModul_URL = "http://esvolon.uniqdesignfactory.com/api/users/set-modul";
     }
 
     [System.Serializable]

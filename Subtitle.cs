@@ -42,24 +42,53 @@ public class Subtitle : MonoBehaviour
 
     public VideoPlayer Player;
 
+    DataServices DS;
+
+    
+
+
+
     public void Update()
     {
-        //if(Player.loopPointReached == true)
         
     }
 
-    void PointGain(UnityEngine.Video.VideoPlayer vp)
+    //Earn points by watching video fully
+    void VideoPointEarning(int game)
     {
-        vp.playbackSpeed = vp.playbackSpeed / 10.0F;
+        //START CANVAS VIDEO PANEL
+
+        //
+
+        //Çalışıyor ama başlamadan önce 3 kere if içine giriyor
+        if (!Player.isPlaying)
+        {
+            //Earn 10 points for every minutes
+
+        }
+    }
+    //Earn points by completing tests
+    void TestPointEarning(int region)
+    {
+        //START CANVAS TEST PANEL
+
+        //GET QUESTIONS AND ANSWERS
+
+        //DO THE TEST AND GIVE POINTS
+
+        //SEND THE DATA 
+
     }
 
     //Just a variable
     public int i = 0;
     public void Start()
     {
+        DS = GetComponent<DataServices>();
         //NOT USED ANYMORE, SAVED FOR LATER PURPOSES
         //Game_Path = Application.persistentDataPath;
         //path = Game_Path + "/TR_1_1.vtt";
+
         Reader("TR", 1, 1);
         ShowTimeDifference();
     }

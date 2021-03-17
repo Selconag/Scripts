@@ -59,6 +59,7 @@ public class DataServices : MonoBehaviour
     {
         Game_Path = Application.persistentDataPath;
         Cpath = Game_Path + "/Connection.json";
+
     }
 
 
@@ -163,18 +164,42 @@ public class DataServices : MonoBehaviour
         }
 
     }
-    
+    //COMPLETED!!
     //Used Only for Sending Pre-Test Questions Data
     public int SendTestData(PreTest test)
     {
         test.user_id = con.user_id;
-        test.security = con.security;
+        test.security = con.security; 
         Tjson = JsonUtility.ToJson(test) ?? "";
         //Send Pre-test Data
         returner = Int32.Parse(Modular_Data_Sender(Tjson, 4));
         return returner;
     }
-    
+
+    //UNCOMPLETED NOT USED FOR NOW
+    //Used for CharSelection and Char data sending
+    public int CharSelection(int character)
+    {
+        user.user_id = con.user_id;
+        user.security = con.security;
+        user.karakter = character;
+        Ujson = JsonUtility.ToJson(user) ?? "";
+        returner = Int32.Parse(Modular_Data_Sender(Ujson, 6));
+        return returner;
+    }
+
+    //UNCOMPLETED NOT USED FOR NOW
+    //Used Only for Sending Pre-Test Questions Data
+    public int SetModul(int FinishedGame)
+    {
+        user.user_id = con.user_id;
+        user.security = con.security;
+        user.modul = FinishedGame;
+        Ujson = JsonUtility.ToJson(user) ?? "";
+        returner = Int32.Parse(Modular_Data_Sender(Ujson, 7));
+        return returner;
+    }
+
     //NON USED PROTOTYPE FOR FURTHER USAGE
     //OTHER PROTOTYPES ARE UPGRADED VERSION OF THIS CODE BLOCK
     IEnumerator Upload()
@@ -252,6 +277,14 @@ public class DataServices : MonoBehaviour
             case 5:
                 URL = Links.GetUser_URL;
                 break;
+                //Send selected character value
+            case 6:
+                URL = Links.CharSelect_URL;
+                break;
+             //Send game score to server
+            case 7:
+                URL = Links.SetModul_URL;
+                break;
             default:
                 URL = Links.GetUser_URL;
                 break;
@@ -281,4 +314,14 @@ public class DataServices : MonoBehaviour
         response.Close();
         return res.response.ToString();
     }
+
+    
+    //Earn points from different things
+    //Subtitle.cs => DataServices.PointGainandSend
+    void PointGainandSend(int game)
+    {
+
+    }
+    
+
 }

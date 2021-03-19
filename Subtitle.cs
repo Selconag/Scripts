@@ -41,32 +41,179 @@ public class Subtitle : MonoBehaviour
     public TextAsset Subtitle_Textfile;
 
     public VideoPlayer Player;
+    public GameObject  VideoPanel;
+    public GameObject Subtitles;
 
     DataServices DS;
 
-    
+    public string CurrentLanguage = "TR";
 
+    public float Total_Token;
 
+    //Just a variable
+    public int i = 0;
+    public void Start()
+    {
+        DS = GameObject.Find("Something").GetComponent<DataServices>();
+        //DS = GameObject.Find("DataServices").GetComponent<DataServices>();
+
+        //NOT USED ANYMORE, SAVED FOR LATER PURPOSES
+        //Game_Path = Application.persistentDataPath;
+        //path = Game_Path + "/TR_1_1.vtt";
+        Player.isLooping = false;
+        Player.playOnAwake = false;
+        //BELOW PART IS WORKING CORRECTLY HOWEVER NEEDS MORE IMPROVEMENTS
+    }
 
     public void Update()
     {
+        //if back button is pressed, cancel anything
         
     }
 
-    //Earn points by watching video fully
-    void VideoPointEarning(int game)
+    //NOT COMPLETED
+    //WILL WORK LATER
+    //If videoplaying is cancelled in midway
+    //Dont give points to the user
+    //Stop the video player seperately
+    public void CancelVideo()
     {
-        //START CANVAS VIDEO PANEL
-
-        //
-
-        //Çalışıyor ama başlamadan önce 3 kere if içine giriyor
-        if (!Player.isPlaying)
+        StopAllCoroutines();
+        VideoPanel.SetActive(false);
+        Subtitles.SetActive(false);
+        Player.Stop();
+    }
+    //NOT COMPLETED
+    //WILL WORK LATER
+    //String can be send through here so we can just find the video
+    public void GetBillboardButton()
+    {
+        //get player controller object
+        Player_Controller P = GameObject.FindGameObjectWithTag("Player").GetComponent<Player_Controller>();
+        RaycastHit hit = P.hit;
+        //DETECT WHICH MODULE IS TRIGGER
+        string Module_Name = hit.collider.gameObject.name;
+        switch (Module_Name)
         {
-            //Earn 10 points for every minutes
+            //Video Modules
+            case "billboard_1_1":
+                //Call video reader as
+                VideoPointEarning(1, 1);
+                Reader(CurrentLanguage, 1, 1);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_1_2":
+                VideoPointEarning(1, 2);
+
+                Reader(CurrentLanguage, 1, 2);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_2_1":
+                VideoPointEarning(2, 1);
+
+                Reader(CurrentLanguage, 2, 1);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_2_2":
+                VideoPointEarning(2, 2);
+
+                Reader(CurrentLanguage, 2, 2);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_3_1":
+                VideoPointEarning(3, 1);
+
+                Reader(CurrentLanguage, 3, 1);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_3_2":
+                VideoPointEarning(3, 2);
+
+                Reader(CurrentLanguage, 3, 2);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_4_1":
+                VideoPointEarning(4, 1);
+
+                Reader(CurrentLanguage, 4, 1);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_4_2":
+                VideoPointEarning(4, 2);
+
+                Reader(CurrentLanguage, 4, 2);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_5_1":
+                VideoPointEarning(5, 1);
+
+                Reader(CurrentLanguage, 5, 1);
+                ShowTimeDifference();
+
+                break;
+            case "billboard_5_2":
+                VideoPointEarning(5, 2);
+
+                Reader(CurrentLanguage, 5, 2);
+                ShowTimeDifference();
+
+                break;
+                //Test Modules
+
+
+                //Reading Modules
+
 
         }
+
+
+
+
     }
+
+    //HALF COMPLETED
+    //WILL WORK LATER
+    //Send points to the user
+    void EndReached(UnityEngine.Video.VideoPlayer vp)
+    {
+        //Earn 2 points for every minutes = (Totalminutes + 1) * 2 => Earned points
+        Total_Token = Total_Token * 2f;
+        //SEND THE DATA to GAME as tokens
+        //CALL DataServices.PointGainandSend(10=[as points]);
+        DS.PointGainandSend((int)Total_Token);
+        Total_Token = 0;
+    }
+
+    //NOT COMPLETED
+    //WILL WORK LATER
+    //Earn points by watching video fully
+    void VideoPointEarning(int modul, int video)
+    {
+        //FIND WHICH VIDEO IS GOING TO PLAYING
+        Player.clip = Resources.Load<VideoClip>("Videos/" + modul + '_' + video);
+        //FIND ITS LENGTH, NOT USED ANYMORE
+        //double x = Resources.Load<VideoClip>("Videos/" + modul + '_' + video).length;
+        //Look to Subber()=> Total_Token float variable, holds minutes
+
+        //START CANVAS VIDEO PANEL
+        VideoPanel.SetActive(true);
+        Subtitles.SetActive(true);
+        //WATCH THE VIDEO
+        Player.Play();
+        //WHEN THE VIDEO ENDS GET POINTS
+        Player.loopPointReached += EndReached; //====>>> Call a method which gives points to the user
+    }
+
+    //NOT COMPLETED
+    //WILL WORK LATER
     //Earn points by completing tests
     void TestPointEarning(int region)
     {
@@ -78,23 +225,13 @@ public class Subtitle : MonoBehaviour
 
         //SEND THE DATA 
 
+        //CALL DataServices.PointGainandSend(10=[as points]);
+
     }
 
-    //Just a variable
-    public int i = 0;
-    public void Start()
-    {
-        DS = GetComponent<DataServices>();
-        //NOT USED ANYMORE, SAVED FOR LATER PURPOSES
-        //Game_Path = Application.persistentDataPath;
-        //path = Game_Path + "/TR_1_1.vtt";
-
-        Reader("TR", 1, 1);
-        ShowTimeDifference();
-    }
+    //SUBTITLE READER
     //Take the subtitles from source
     //Get time differences of every subtitle
-    
     public void Reader(string lang,int modul,int video)
     {
         /*
@@ -161,11 +298,12 @@ public class Subtitle : MonoBehaviour
 
         }
     }
+    //SUBBER
     //Start the Subtitle Sequence
     //For now only waits for the sub end
-    //Working correctly
     public IEnumerator Subber()
     {
+        DateTime t_start = Convert.ToDateTime(System.DateTime.Now);
         for (int j = 0; j < Loop; j++)
         {
             TimeSpan ts;
@@ -177,11 +315,30 @@ public class Subtitle : MonoBehaviour
             //Wait for next subtitle appear
             yield return new WaitForSeconds(f);
         }
+        DateTime t_end = Convert.ToDateTime(System.DateTime.Now);
+        Total_Token = (float)((t_end-t_start).TotalMinutes) + 1f;
+        yield return new WaitForSeconds(0.1f);
+
     }
     //Will hold the time to change and print subtitles on the screen
     public void ShowTimeDifference()
     {
         StartCoroutine(Subber());
+    }
+
+    public IEnumerator WaitForVideoEnds()
+    {
+            for (int j = 0; j < Loop; j++)
+            {
+                TimeSpan ts;
+                DateTime T_S = Convert.ToDateTime((Sub_Start[j]));
+                DateTime T_E = Convert.ToDateTime((Sub_End[j]));
+                ts = T_E - T_S;
+                Subtitle_UI_Element.text = Sub_Texts[j];
+                float f = (float)(ts.TotalSeconds);
+                //Wait for next subtitle appear
+                yield return new WaitForSeconds(f);
+            }
     }
 
 }

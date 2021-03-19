@@ -14,13 +14,14 @@ using System.Text.RegularExpressions;
 public class Menus : MonoBehaviour
 {
     //Other Classes
-    DataServices D;
+    public DataServices D;
     //UI Panels of Menu
     public GameObject Landing;
     public GameObject Connect;
     public GameObject Signin;
     public GameObject Login;
     public GameObject PreTest;
+    public GameObject CharSelection;
     //Pretest sub panel groups
     public GameObject Start_Test_Panel;
     public GameObject User_Detail_Panel;
@@ -59,6 +60,11 @@ public class Menus : MonoBehaviour
     //Error Panel
     public GameObject ErrorPanel;
     public Text ErrorText;
+    //Character Images
+    public GameObject Char1;
+    public GameObject Char2;
+    public GameObject Char3;
+
 
     //Questions that will be used in Pre-Test
     //1-8 Questions will take Yes/No
@@ -119,7 +125,7 @@ public class Menus : MonoBehaviour
                 //Fadeaway from landing to connect page
                 StartCoroutine(Landing_Fade());
                 //Awake the DataServices
-                D = GetComponent<DataServices>();
+                DontDestroyOnLoad(D.gameObject);
             }
             else
             {
@@ -137,7 +143,7 @@ public class Menus : MonoBehaviour
                     //Fadeaway from landing to connect page
                     StartCoroutine(Landing_Fade());
                     //Awake the DataServices
-                    D = GetComponent<DataServices>();
+                    DontDestroyOnLoad(D.gameObject);
                 }
                 else Application.Quit();
             }
@@ -152,7 +158,7 @@ public class Menus : MonoBehaviour
             //Fadeaway from landing to connect page
             StartCoroutine(Landing_Fade());
             //Awake the DataServices
-            D = GetComponent<DataServices>();
+            DontDestroyOnLoad(D.gameObject);
         }
         //IF APPLICATION IS RUNNING ON WHATEVER
         else
@@ -164,7 +170,7 @@ public class Menus : MonoBehaviour
             //Fadeaway from landing to connect page
             StartCoroutine(Landing_Fade());
             //Awake the DataServices
-            D = GetComponent<DataServices>();
+            DontDestroyOnLoad(D.gameObject);
         }
 
     }
@@ -179,8 +185,9 @@ public class Menus : MonoBehaviour
         //Fadeaway from landing to connect page
         StartCoroutine(Landing_Fade());
         //Awake the DataServices
-        D = GetComponent<DataServices>();
+        //D = GetComponent<DataServices>();
         //D.BuildSerialization(D.con);
+        DontDestroyOnLoad(D.gameObject);
     }
 
     //For now Awake is not used
@@ -193,6 +200,110 @@ public class Menus : MonoBehaviour
          */
 
     }
+
+    //Character Selecting Button
+    //Selected char will remain forever
+
+    public void Char_Selection(int Character)
+    {
+        int resp;
+        if (Char1.activeInHierarchy)
+        {
+            //Go to 2nd character from 1st
+            resp = D.CharSelection(1);
+            if(resp == 1)
+            {
+                //Everything is ok, go to game
+            }
+            else 
+            {
+                //Some error occured try again
+
+            }
+        }
+        else if (Char2.activeInHierarchy)
+        {
+            //Go to 3rd character from 2nd
+            resp = D.CharSelection(2);
+            if (resp == 1)
+            {
+                //Everything is ok, go to game
+            }
+            else
+            {
+                //Some error occured try again
+
+            }
+        }
+        else
+        {
+            //Go to 1st character from 3rd
+            resp = D.CharSelection(3);
+            if (resp == 1)
+            {
+                //Everything is ok, go to game
+            }
+            else
+            {
+                //Some error occured try again
+
+            }
+        }
+        
+    }
+    //Character image changer
+    //Selected char will remain forever
+    public void Char_Change(bool button)
+    {
+        //Go right
+        if(button)
+        {
+            if (Char1.activeInHierarchy)
+            {
+                //Go to 2nd character from 1st
+                Char1.SetActive(false);
+                Char2.SetActive(true);
+
+            }
+            else if (Char2.activeInHierarchy)
+            {
+                //Go to 3rd character from 2nd
+                Char2.SetActive(false);
+                Char3.SetActive(true);
+            }
+            else
+            {
+                //Go to 1st character from 3rd
+                Char3.SetActive(false);
+                Char1.SetActive(true);
+            }
+        }
+        //Go Left
+        else
+        {
+            if (Char1.activeInHierarchy)
+            {
+                //Go to 3rd character from 1st
+                Char1.SetActive(false);
+                Char3.SetActive(true);
+            }
+            else if (Char2.activeInHierarchy)
+            {
+                //Go to 1st character from 2nd
+                Char2.SetActive(false);
+                Char1.SetActive(true);
+            }
+            else
+            {
+                //Go to 2nd character from 3rd
+                Char3.SetActive(false);
+                Char2.SetActive(true);
+            }
+        }
+    }
+
+
+
 
     //COMPLETED!!
     //Forgot password sends email to the server
@@ -330,6 +441,10 @@ public class Menus : MonoBehaviour
                         NextButton.SetActive(false);
                         //Activate the Start game Button
                         StartGameButton.SetActive(true);
+                        //GO TO CHAR SELECTION PANEL
+                        PreTest.SetActive(false);
+                        CharSelection.SetActive(true);
+
                         break;
                 }
                 //Increment the counter to get next question
@@ -377,8 +492,16 @@ public class Menus : MonoBehaviour
             {
                 if (D.con.giris_test == 1)
                 {
-                    //Go to game scene
-                    SceneManager.LoadScene("Basketbol");
+                    //If user not selected character go to char selection panel
+                    if(D.con.karakter == 0)
+                    {
+                        CharSelection.SetActive(true);
+                    }
+                    //Else start the game
+                    else
+                    {
+                        SceneManager.LoadScene("Game_Map");
+                    }
                 }
                 else
                 {
@@ -457,7 +580,7 @@ public class Menus : MonoBehaviour
 
     }
 
-    //COMPLETED !!
+    //COMPLETED ! WILL BE UPDATED !!!!
     //Login button behaivour region from Signin Panel
     //NOTICE: CAN'T CHECK IF USER IS AVAILABLE OR NOT
     //OR TRUE CONNECTION IS ESTABLISHED
@@ -507,7 +630,20 @@ public class Menus : MonoBehaviour
                             if (D.con.giris_test == 1)
                             {
                                 //Go to game scene
-                                SceneManager.LoadScene("Basketbol");
+                                if (D.con.karakter == 0)
+                                {
+                                    //WILL BE UPDATED LATER
+                                    CharSelection.SetActive(true);
+                                    NextButton.SetActive(false);
+                                    User_Detail_Panel.SetActive(false);
+                                    TestGroup.SetActive(false);
+
+
+                                }
+                                else
+                                {
+                                    SceneManager.LoadScene("Game_Map");
+                                }
                             }
                             else
                             {
@@ -519,7 +655,7 @@ public class Menus : MonoBehaviour
                                 TestGroup.SetActive(true);
                             }
                         }
-                        //Else if for //BURADA KALDIK EN SON İŞİM RESPONSE İLE SİSTEM KONTROLÜ YAPMAKTI !!! EKLEME YAPMAYI UNUTMA
+                        //Else if for
                         // public string Modular_Data_Sender(string data,int state) BURAYA BAK
                         else
                         {
@@ -583,7 +719,6 @@ public class Menus : MonoBehaviour
         yield return new WaitForSeconds(1);
         Landing.SetActive(false);
         Connect.SetActive(true);
-        Debug.Log("Connected");
         yield return 0;
     }
     //COMPLETED!!
@@ -648,10 +783,14 @@ public class Menus : MonoBehaviour
             //Char Selection Page
             case 4:
                 //Char Selection to Connect screen
+                CharSelection.SetActive(false);
+                Connect.SetActive(true);
                 break;
             //Game Screen page
             case 5:
                 //Game Screen to char selection screen
+                //OR just exit from game from in game menu
+                Application.Quit();
                 break;
         }
     }
@@ -659,7 +798,7 @@ public class Menus : MonoBehaviour
     //Start button for scene change from UI to PlayArea
     public void StartGame()
     {
-        SceneManager.LoadScene("Basketbol");
+        SceneManager.LoadScene("Game_Map");
     }
 
     //NOT USED PART, SAVED FOR REFERENCE

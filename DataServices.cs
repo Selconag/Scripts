@@ -23,9 +23,13 @@ public class DataServices : MonoBehaviour
     private string Cjson;
     //PreTest class data taker
     private string Tjson;
+    //Game class data taker
+    private string Gjson;
 
     //User class data stored path    
     private string path = Game_Path + "/UserData.json";//Can change later
+
+    private string Gpath = Game_Path + "/Game.json";
     //Connect class data stored path
     string Cpath;//Can change later
 
@@ -59,6 +63,7 @@ public class DataServices : MonoBehaviour
     {
         Game_Path = Application.persistentDataPath;
         Cpath = Game_Path + "/Connection.json";
+        Gpath = Game_Path + "/Game.json";
 
     }
 
@@ -68,6 +73,7 @@ public class DataServices : MonoBehaviour
     public PreTest pre = new PreTest();
     public Email mail = new Email();
     public Response res = new Response();
+    public Game game = new Game();
 
     //API Connection url addresses are in the Library.cs
 
@@ -117,24 +123,53 @@ public class DataServices : MonoBehaviour
         {
             File.Create(Cpath);
             System.IO.File.WriteAllText(Cpath, Cjson);
+            //NEW IMPLEMENTATION, WILL BE TESTED
+            File.Create(Gpath);
+            Gjson = JsonUtility.ToJson(game) ?? "";
+            System.IO.File.WriteAllText(Gpath, Gjson);
         }
         return returner;
     }
     //Used For Manual Login
+    //Added game.json file creator
     public int LoginManuel(User user1)
     {
         
         Ujson = JsonUtility.ToJson(user1) ?? "";
         returner = Int32.Parse(Modular_Data_Sender(Ujson, 1));
         Cjson = JsonUtility.ToJson(con) ?? "";
+        //NOT SURE!!!
+        if (File.Exists(Gpath))
         //Below may wrong implemented, will look detailed later
         //con = JsonUtility.FromJson<Connection>(Cjson);
-        if(File.Exists(Cpath))
-        System.IO.File.WriteAllText(Cpath, Cjson);
+        //Connection data creator
+        if (File.Exists(Cpath))
+        {
+            //Update Connection.json variables
+            System.IO.File.WriteAllText(Cpath, Cjson);
+
+        }
         else
         {
             File.Create(Cpath);
             System.IO.File.WriteAllText(Cpath, Cjson);
+        }
+        //if there is a game data, ???
+        //A checker will be written later !!!
+        if (File.Exists(Gpath))
+        {
+            Gjson = System.IO.File.ReadAllText(Gpath);
+            game = JsonUtility.FromJson<Game>(Gjson);
+            //WILL USED LATER
+            //System.IO.File.WriteAllText(Gpath, Gjson);
+
+        }
+        //If there is no local save data, create one
+        else
+        {
+            File.Create(Gpath);
+            Gjson = JsonUtility.ToJson(game) ?? "";
+            System.IO.File.WriteAllText(Gpath, Gjson);
         }
         return returner;
     }
@@ -144,25 +179,35 @@ public class DataServices : MonoBehaviour
     //if data exists return data as string
     //else return "No" as string
     //connectıon data is used for AUTO-LOGIN process
+    //ALSO GET GAMEDATA.JSON FILE!!!!
     public int GetLocalUserData()
     {
         //check if file is available
         //then post security and u_id to server
         if (File.Exists(Cpath))
         {
+            //Connection datas
             Cjson = System.IO.File.ReadAllText(Cpath);
             con = JsonUtility.FromJson<Connection>(Cjson);
+            //Game datas NOT TESTED
+            Gjson = System.IO.File.ReadAllText(Gpath);
+            game = JsonUtility.FromJson<Game>(Gjson);
             //post data here and then get the user data from server
-            returner=Int32.Parse(Modular_Data_Sender(Cjson,5));
+            returner =Int32.Parse(Modular_Data_Sender(Cjson,5));
+            //NOT COMPLETED
+            //Update UserData from Connection variables that came from Server response
+            user.karakter = con.karakter;
+            user.modul = con.modul;
             return returner;
         }
+        //There is no such file so abort the mission
         else
         {
-            Cjson = System.IO.File.ReadAllText(Cpath);
+
             Debug.Log("No files exist! Please Log-in first");
             return 0;
         }
-
+        
     }
     //COMPLETED!!
     //Used Only for Sending Pre-Test Questions Data
@@ -178,6 +223,7 @@ public class DataServices : MonoBehaviour
 
     //UNCOMPLETED NOT USED FOR NOW
     //Used for CharSelection and Char data sending
+    //D.CharSelection(x); => Set char and send to the system
     public int CharSelection(int character)
     {
         user.user_id = con.user_id;
@@ -189,7 +235,13 @@ public class DataServices : MonoBehaviour
     }
 
     //UNCOMPLETED NOT USED FOR NOW
-    //Used Only for Sending Pre-Test Questions Data
+    //Used Only for Sending Modul Data
+    //Basketbol (20 puana ulaşırsa) => SetModul(1) olarak çağır
+    //Archery (20 puana ulaşırsa) => SetModul(2) olarak çağır
+    //Long Jump (20 puana ulaşırsa) => SetModul(3) olarak çağır
+    //SotPut (20 puana ulaşırsa) => SetModul(4) olarak çağır
+    //Javelin (20 puana ulaşırsa) => SetModul(5) olarak çağır
+    //DataServices.SetModul(x); => Biten oyunun verisini sisteme gönderir
     public int SetModul(int FinishedGame)
     {
         user.user_id = con.user_id;
@@ -315,12 +367,17 @@ public class DataServices : MonoBehaviour
         return res.response.ToString();
     }
 
-    
+
+
+
     //Earn points from different things
     //Subtitle.cs => DataServices.PointGainandSend
-    void PointGainandSend(int game)
+    //USED FOR:Ball throw earning => Library.token
+    //YAĞIZA SOR TOPLAM TOP ATMA HAKKI SİSTEME GÖNDERİLECEK Mİ DİYE?
+    //Gain tokens and save it local
+    public void PointGainandSend(int point)
     {
-
+        game.tokens += point; 
     }
     
 

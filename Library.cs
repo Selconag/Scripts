@@ -57,7 +57,7 @@ namespace Library
     }
     //Class of game inputs
     [System.Serializable]
-    public class Game
+    public class Game //LOCAL
     {
         //Check how many game tokens player has
         //Gametokens are used in mini games like ammunition in a weapon
@@ -72,8 +72,6 @@ namespace Library
         Javelin Throw: 40 points => Long jump
         Long Jump: 30 points => Final Test
          */
-        //After final test is done the client gets his/hers reward for completing the course
-        [SerializeField] public int total_score = 0;
         //Current Basket Score
         [SerializeField] public int Basket_Score = 0;
         //Current Shotput Score

@@ -177,6 +177,7 @@ public class Menus : MonoBehaviour
 
     void Start()
     {
+        Screen.orientation = ScreenOrientation.Portrait;
         PreTest.SetActive(false);
         //Load first question to Questions Array for pretest
         QuestionTextPlace.text = Questions[i];
@@ -189,7 +190,7 @@ public class Menus : MonoBehaviour
         //D.BuildSerialization(D.con);
         DontDestroyOnLoad(D.gameObject);
     }
-
+      
     //For now Awake is not used
     private void Awake()
     {
@@ -204,8 +205,16 @@ public class Menus : MonoBehaviour
     //Character Selecting Button
     //Selected char will remain forever
 
-    public void Char_Selection(int Character)
+    public void Char_Selection()
     {
+        //Ask user if he/she is sure to select that character
+        if (true)
+        {
+            //Create or call a button and make it asks to user
+
+
+        }
+
         int resp;
         if (Char1.activeInHierarchy)
         {

@@ -379,6 +379,12 @@ public class DataServices : MonoBehaviour
     {
         game.tokens += point; 
     }
-    
+    //Used only for mini-game Saving
+    public void BuildGameSave()
+    {
+        Gjson = JsonUtility.ToJson(game);
+        File.WriteAllText(Gpath, Gjson);
+    }
+
 
 }

@@ -82,6 +82,7 @@ public class Subtitle : MonoBehaviour
         VideoPanel.SetActive(false);
         Subtitles.SetActive(false);
         Player.Stop();
+        Screen.orientation = ScreenOrientation.Portrait;
     }
     //NOT COMPLETED
     //WILL WORK LATER
@@ -98,72 +99,90 @@ public class Subtitle : MonoBehaviour
             //Video Modules
             case "billboard_1_1":
                 //Call video reader as
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(1, 1);
                 Reader(CurrentLanguage, 1, 1);
                 ShowTimeDifference();
-
+                Screen.orientation = ScreenOrientation.Portrait;
                 break;
             case "billboard_1_2":
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(1, 2);
-
                 Reader(CurrentLanguage, 1, 2);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
             case "billboard_2_1":
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(2, 1);
-
                 Reader(CurrentLanguage, 2, 1);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
             case "billboard_2_2":
+                Screen.orientation = ScreenOrientation.Landscape;
+
                 VideoPointEarning(2, 2);
 
                 Reader(CurrentLanguage, 2, 2);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
             case "billboard_3_1":
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(3, 1);
 
                 Reader(CurrentLanguage, 3, 1);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
             case "billboard_3_2":
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(3, 2);
 
                 Reader(CurrentLanguage, 3, 2);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
             case "billboard_4_1":
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(4, 1);
 
                 Reader(CurrentLanguage, 4, 1);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
             case "billboard_4_2":
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(4, 2);
 
                 Reader(CurrentLanguage, 4, 2);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
             case "billboard_5_1":
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(5, 1);
 
                 Reader(CurrentLanguage, 5, 1);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
             case "billboard_5_2":
+                Screen.orientation = ScreenOrientation.Landscape;
                 VideoPointEarning(5, 2);
 
                 Reader(CurrentLanguage, 5, 2);
                 ShowTimeDifference();
+                Screen.orientation = ScreenOrientation.Portrait;
 
                 break;
                 //Test Modules
@@ -171,11 +190,7 @@ public class Subtitle : MonoBehaviour
 
                 //Reading Modules
 
-
         }
-
-
-
 
     }
 
@@ -215,6 +230,7 @@ public class Subtitle : MonoBehaviour
     //NOT COMPLETED
     //WILL WORK LATER
     //Earn points by completing tests
+    //Read by ReadAllText and then seperate it into different types
     void TestPointEarning(int region)
     {
         //START CANVAS TEST PANEL

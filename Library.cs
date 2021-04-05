@@ -82,6 +82,8 @@ namespace Library
         [SerializeField] public int LongJump_Score = 0;
         //Current Javelin throw Score
         [SerializeField] public int Javelin_Score = 0;
+        //Language that is seleceted
+        [SerializeField] public int Language = 0;
 
     }
 

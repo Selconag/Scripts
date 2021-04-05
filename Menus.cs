@@ -15,6 +15,7 @@ public class Menus : MonoBehaviour
 {
     //Other Classes
     public DataServices D;
+    
     //UI Panels of Menu
     public GameObject Landing;
     public GameObject Connect;
@@ -65,6 +66,11 @@ public class Menus : MonoBehaviour
     public GameObject Char2;
     public GameObject Char3;
 
+    //Are You Sure Panel
+    public GameObject Yousure;
+
+    //Language Panel
+    public GameObject LanguagePanel;
 
     //Questions that will be used in Pre-Test
     //1-8 Questions will take Yes/No
@@ -82,6 +88,18 @@ public class Menus : MonoBehaviour
         "What do you think about your level of knowledge and skills in social innovation and leadership in sports?"
     };
 
+    private string[] TR_Questions =
+    {
+        "Have you completed an online training on volunteering before?",
+        "Have you ever had a gamification-based online training?",
+        "Have you completed an online training before and received a certificate?",
+        "Do you have any knowledge about social leadership and volunteering in sport?",
+        "Do you have any knowledge about social innovation in/through sport?",
+        "Do you have any knowledge about social inclusion in sport?",
+        "Do you have any knowledge on social equality in sport?",
+        "Do you have any knowledge on good governance, safety and security in sport events?",
+        "What do you think about your level of knowledge and skills in social innovation and leadership in sports?"
+    };
     private void Update()
     {
         //COMPLETED!
@@ -182,13 +200,21 @@ public class Menus : MonoBehaviour
         //Load first question to Questions Array for pretest
         QuestionTextPlace.text = Questions[i];
         //Go to Landing page
+
         Landing.SetActive(true);
+
         //Fadeaway from landing to connect page
+
         StartCoroutine(Landing_Fade());
+
         //Awake the DataServices
         //D = GetComponent<DataServices>();
         //D.BuildSerialization(D.con);
+        //Add a game reader
+
         DontDestroyOnLoad(D.gameObject);
+
+        
     }
       
     //For now Awake is not used
@@ -205,60 +231,37 @@ public class Menus : MonoBehaviour
     //Character Selecting Button
     //Selected char will remain forever
 
-    public void Char_Selection()
+    public void Char_Selection(int character)
     {
-        //Ask user if he/she is sure to select that character
-        if (true)
-        {
-            //Create or call a button and make it asks to user
-
-
-        }
-
         int resp;
-        if (Char1.activeInHierarchy)
+        if (character == 1)
         {
             //Go to 2nd character from 1st
             resp = D.CharSelection(1);
-            if(resp == 1)
-            {
-                //Everything is ok, go to game
-            }
-            else 
-            {
-                //Some error occured try again
-
-            }
         }
-        else if (Char2.activeInHierarchy)
+        else if (character == 2)
         {
             //Go to 3rd character from 2nd
             resp = D.CharSelection(2);
-            if (resp == 1)
-            {
-                //Everything is ok, go to game
-            }
-            else
-            {
-                //Some error occured try again
-
-            }
         }
         else
         {
             //Go to 1st character from 3rd
             resp = D.CharSelection(3);
-            if (resp == 1)
-            {
-                //Everything is ok, go to game
-            }
-            else
-            {
-                //Some error occured try again
-
-            }
         }
-        
+        //Check if everything is ok
+        if (resp == 1)
+        {
+            //Everything is ok, go to game
+            StartGame();
+        }
+        else
+        {
+            //Some error occured try again
+            ErrorText.text = "Some Error Occured";
+            ErrorButton_Waiter();
+        }
+
     }
     //Character image changer
     //Selected char will remain forever
@@ -505,6 +508,9 @@ public class Menus : MonoBehaviour
                     if(D.con.karakter == 0)
                     {
                         CharSelection.SetActive(true);
+                        NextButton.SetActive(false);
+                        User_Detail_Panel.SetActive(false);
+                        TestGroup.SetActive(false);
                     }
                     //Else start the game
                     else
@@ -646,8 +652,6 @@ public class Menus : MonoBehaviour
                                     NextButton.SetActive(false);
                                     User_Detail_Panel.SetActive(false);
                                     TestGroup.SetActive(false);
-
-
                                 }
                                 else
                                 {
@@ -809,25 +813,92 @@ public class Menus : MonoBehaviour
     {
         SceneManager.LoadScene("Game_Map");
     }
-
-    //NOT USED PART, SAVED FOR REFERENCE
-    /*
-        IEnumerator Dialog()
+    public void CharYesNo(bool yes)
+    {
+        if (Yousure.activeInHierarchy)
         {
-            // ...
-            var waitForButtonYesNo = new WaitForUIButtons(yesButton, noButton).ReplaceCallback(b => Debug.Log("Button with name " + b.name + " got pressed"));
-            yield return waitForButtonYesNo.Reset();
-            if (waitForButtonYesNo.PressedButton == yesButton)
+            if (yes)
             {
-                // yes was pressed
-                Next_Button();
-
+                //set karakter 1
+                if (Char1.activeInHierarchy)
+                {
+                    D.user.karakter = 1;
+                    Char_Selection(1);
+                }
+                //set karakter 2
+                else if (Char2.activeInHierarchy)
+                {
+                    D.user.karakter = 2;
+                    Char_Selection(2);
+                }
+                //set karakter 3
+                else
+                {
+                    D.user.karakter = 3;
+                    Char_Selection(3);
+                }
+                Yousure.SetActive(false);
             }
             else
             {
-                // no was pressed
-                NextButton.SetActive(true);
+                Yousure.SetActive(false);
             }
         }
-    */
+        else
+        {
+            Yousure.SetActive(true);
+        }
+    }
+
+
+    public void LanguagePicker(int language)
+    {
+        switch (language)
+        {
+            //Close panel
+            case 0:
+                LanguagePanel.SetActive(false);
+                //L_S.Change_Language(0);
+                break;
+            //Choose English
+            case 1:
+                LanguagePanel.SetActive(false);
+                D.game.Language = 1;
+                D.UpdateLanguage(1);
+
+                break;
+            //Choose Turkish
+            case 2:
+                LanguagePanel.SetActive(false);
+                D.game.Language = 2;
+                D.UpdateLanguage(2);
+
+                break;
+            //Choose ???
+            case 3:
+                LanguagePanel.SetActive(false);
+
+                break;
+            //Choose ???
+            case 4:
+                LanguagePanel.SetActive(false);
+
+                break;
+            //Choose ???
+            case 5:
+                LanguagePanel.SetActive(false);
+
+                break;
+            //Choose ???
+            case 6:
+                LanguagePanel.SetActive(false);
+
+                break;
+                //Open LANGUAGE PANEL
+            case 9:
+                LanguagePanel.SetActive(true);
+                break;
+        }
+    }
+
 }

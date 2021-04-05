@@ -13,6 +13,7 @@ using System.Text;
 using System.Net;
 using Newtonsoft.Json;
 using System.Net.Http;
+using UnityEngine.SceneManagement;
 //Library is our resource class for object classes
 using Library;
 public class DataServices : MonoBehaviour
@@ -59,14 +60,19 @@ public class DataServices : MonoBehaviour
     */
     [SerializeField] public static string Game_Path;
     //On application's awakening, the application's path is getted
+
     public void Start()
     {
         Game_Path = Application.persistentDataPath;
         Cpath = Game_Path + "/Connection.json";
         Gpath = Game_Path + "/Game.json";
-
+        SceneManager.activeSceneChanged += ChangedActiveScene;
     }
 
+    //Will be used for changing menu language texts
+    //Will be used for changing game language texts
+    public Language_Settings LanguageMenu;
+    public Language_Game LanguageGame;
 
     public User user = new User();
     public Connection con = new Connection();
@@ -132,14 +138,12 @@ public class DataServices : MonoBehaviour
     }
     //Used For Manual Login
     //Added game.json file creator
-    public int LoginManuel(User user1)
+    public int LoginManuel(User user)
     {
         
-        Ujson = JsonUtility.ToJson(user1) ?? "";
+        Ujson = JsonUtility.ToJson(user) ?? "";
         returner = Int32.Parse(Modular_Data_Sender(Ujson, 1));
         Cjson = JsonUtility.ToJson(con) ?? "";
-        //NOT SURE!!!
-        if (File.Exists(Gpath))
         //Below may wrong implemented, will look detailed later
         //con = JsonUtility.FromJson<Connection>(Cjson);
         //Connection data creator
@@ -192,6 +196,9 @@ public class DataServices : MonoBehaviour
             //Game datas NOT TESTED
             Gjson = System.IO.File.ReadAllText(Gpath);
             game = JsonUtility.FromJson<Game>(Gjson);
+            //Get the system Language
+            UpdateLanguage(game.Language);
+
             //post data here and then get the user data from server
             returner =Int32.Parse(Modular_Data_Sender(Cjson,5));
             //NOT COMPLETED
@@ -229,6 +236,7 @@ public class DataServices : MonoBehaviour
         user.user_id = con.user_id;
         user.security = con.security;
         user.karakter = character;
+        con.karakter = character;
         Ujson = JsonUtility.ToJson(user) ?? "";
         returner = Int32.Parse(Modular_Data_Sender(Ujson, 6));
         return returner;
@@ -299,6 +307,8 @@ public class DataServices : MonoBehaviour
 
     //MODULAR TESTED DATA SENDER and GETTER
     //Used for web connection and data sending/getting from server
+
+    //GET STRING OF DATA RETURNED FROM SERVER
     public string Modular_Data_Sender(string data,int state)
     {
         string URL;
@@ -368,8 +378,6 @@ public class DataServices : MonoBehaviour
     }
 
 
-
-
     //Earn points from different things
     //Subtitle.cs => DataServices.PointGainandSend
     //USED FOR:Ball throw earning => Library.token
@@ -387,4 +395,43 @@ public class DataServices : MonoBehaviour
     }
 
 
+    //HALF COMPLETED ! 
+    //Will be called in start from Subtitle and Menus scripts
+    public void UpdateLanguage(int Language)
+    {
+        game.Language = Language;
+        if("UIMenu" == SceneManager.GetActiveScene().name)
+        {
+            LanguageMenu = GameObject.Find("LanguageSettings").GetComponent<Language_Settings>();
+            LanguageMenu.Change_Language(Language);
+        }
+            
+        else if ("Game_Map" == SceneManager.GetActiveScene().name)
+        {
+            LanguageGame = GameObject.Find("LanguageGame").GetComponent<Language_Game>();
+            LanguageGame.Change_Language(Language);
+
+        }
+
+
+    }
+
+    private void ChangedActiveScene(Scene current, Scene next)
+    {
+        string currentName = current.name;
+        UpdateLanguage(game.Language);
+    }
+
+    //
+    /*
+    void EndReached(UnityEngine.SceneManagement)
+    { 
+        //Earn 2 points for every minutes = (Totalminutes + 1) * 2 => Earned points
+        Total_Token = Total_Token * 2f;
+        //SEND THE DATA to GAME as tokens
+        //CALL DataServices.PointGainandSend(10=[as points]);
+        DS.PointGainandSend((int)Total_Token);
+        Total_Token = 0;
+    }
+    */
 }

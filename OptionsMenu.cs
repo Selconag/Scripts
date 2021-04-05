@@ -13,10 +13,16 @@ public class OptionsMenu : MonoBehaviour
 
     void Start()
     {
-        DS = GameObject.Find("Something").GetComponent<DataServices>();
+        DS = GameObject.Find("DataServices").GetComponent<DataServices>();
+    }
+
+    //Opens Menu
+    public void Open_Menu()
+    {
+        InGameMenu.SetActive(true);
     }
     //Exits from game
-    void Exit_Game()
+    public void Exit_Game()
     {
         //SAVE ALL DATA BEFORE EXIT
         Save_before_Exit();
@@ -24,20 +30,21 @@ public class OptionsMenu : MonoBehaviour
 
     }
     //Returns to the Menu
-    void Return_to_Menu()
+    public void Return_to_Menu()
     {
         //SAVE ALL DATA BEFORE EXIT
         Save_before_Exit();
         SceneManager.LoadScene("UIMenu");
     }
     //Open the options panel
-    void Options_Panel()
+    public void Options_Panel()
     {
         InGamePanel.SetActive(false);
         OptionsPanel.SetActive(true);
+        //OPTİONS MENU => CHANGE LANGUAGE PART WILL BE ADDED!!!!!!!!!!
     }
     //Return to the game
-    void Return_to_Game()
+    public void Return_to_Game()
     {
         InGameMenu.SetActive(false);
     }
